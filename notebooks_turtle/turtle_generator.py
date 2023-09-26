@@ -494,11 +494,14 @@ class turtle_generator:
     Downloads turtle image to current folder (i.e., present working directory)
     If there is a problem downloading, this function prints a message
     '''
-    import subprocess
-    import os
-    # We skip using the google drive location, as Google blocks downloads of PNGs at some point
+    
+    # We skip using the google drive location, as Google blocks downloads of PNGs after around 50 downloads 
+    #import subprocess
     #result = subprocess.run(['curl -L "https://drive.google.com/uc?export=download&id=1LZBRk31Jan7yPgE44spPkxIK8rNc_dcU" > turtle.png;'], shell=True, capture_output=True)
-    result = subprocess.run(['curl -L "https://www.unm.edu/~jbschroder/img/turtle.png" > turtle.png;'], shell=True, capture_output=True)
+    import os
+    from urllib.request import urlretrieve
+    (file1, message1) = urlretrieve('https://raw.githubusercontent.com/jbschroder/CS108/main/notebooks_turtle/turtle.png', 'turtle.png')
+
     OK = os.path.isfile('./turtle.png')
     if(OK == False):
       print("Something went wrong with downloading turtle image")
@@ -707,7 +710,7 @@ class turtle_generator:
     '''
     
     # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []):
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
       print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -740,7 +743,7 @@ class turtle_generator:
     '''
     
     # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []):
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
       print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -775,7 +778,7 @@ class turtle_generator:
     '''
     
     # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []):
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
       print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -818,7 +821,7 @@ class turtle_generator:
     '''
     
     # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []):
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
       print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -865,7 +868,7 @@ class turtle_generator:
     '''
     
     # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []):
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
       print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -914,7 +917,138 @@ class turtle_generator:
         y_loc = move[1]
         ax.fill_between([x_loc-0.5, x_loc+0.5], [y_loc-0.5, y_loc-0.5], [y_loc+0.5, y_loc+0.5], color='green')
 
-  PUT IS POND AND APTH STUFF HERE
+  def is_pond_above(self):
+    '''
+    Return True or False, whether the pond is above the current turtle location
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    True or False (technically called a Boolean)
+      True is returned if the pond is above you
+      False is returned if the pond is not above you
+    '''
+    
+    # Check that the turtle has been initialized and moved
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
+      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+      return
+    
+    # Check that the pond location is set
+    if self.pond_location == False or self.pond_location == None:
+      print("You didn't specify a pond location when creating the turtle.  So, I can't answer this question about the pond.") 
+      return
+
+    current_loc = self.movements[-1]
+    pond_loc = self.pond_location
+
+    if current_loc[1] < pond_loc[1]:
+      return True
+    else:
+      return False
+  
+  def is_pond_below(self):
+    '''
+    Return True or False, whether the pond is below the current turtle location
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    True or False (technically called a Boolean)
+      True is returned if the pond is below you
+      False is returned if the pond is not below you
+    '''
+    
+    # Check that the turtle has been initialized and moved
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
+      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+      return
+    
+    # Check that the pond location is set
+    if self.pond_location == False or self.pond_location == None:
+      print("You didn't specify a pond location when creating the turtle.  So, I can't answer this question about the pond.") 
+      return
+
+    current_loc = self.movements[-1]
+    pond_loc = self.pond_location
+
+    if current_loc[1] > pond_loc[1]:
+      return True
+    else:
+      return False
+
+  def is_pond_to_right(self):
+    '''
+    Return True or False, whether the pond is to the right of the current turtle location
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    True or False (technically called a Boolean)
+      True is returned if the pond is to the right of you
+      False is returned if the pond is to the right of you
+    '''
+    
+    # Check that the turtle has been initialized and moved
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
+      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+      return
+    
+    # Check that the pond location is set
+    if self.pond_location == False or self.pond_location == None:
+      print("You didn't specify a pond location when creating the turtle.  So, I can't answer this question about the pond.") 
+      return
+
+    current_loc = self.movements[-1]
+    pond_loc = self.pond_location
+
+    if current_loc[0] < pond_loc[0]:
+      return True
+    else:
+      return False
+
+  def is_pond_to_left(self):
+    '''
+    Return True or False, whether the pond is to the left of the current turtle location
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    True or False (technically called a Boolean)
+      True is returned if the pond is to the left of you
+      False is returned if the pond is to the left of you
+    '''
+    
+    # Check that the turtle has been initialized and moved
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
+      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+      return
+    
+    # Check that the pond location is set
+    if self.pond_location == False or self.pond_location == None:
+      print("You didn't specify a pond location when creating the turtle.  So, I can't answer this question about the pond.") 
+      return
+
+    current_loc = self.movements[-1]
+    pond_loc = self.pond_location
+
+    if current_loc[0] > pond_loc[0]:
+      return True
+    else:
+      return False
+
 
   def watch_me_move(self):
     '''
@@ -941,7 +1075,7 @@ class turtle_generator:
     import matplotlib.animation
 
     # Check that we have actual movements to plot
-    if (not hasattr(self, 'movements')) or (self.movements == []):
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
       print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
 
