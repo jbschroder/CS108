@@ -296,6 +296,39 @@ class create_maze:
         
     return False
 
+  def find_open_directions(self, location):
+    '''
+    Given a location on the maze path, return which directions are open in the maze: 'l', 'r', 't', 'b'
+    
+    Parameters
+    ----------
+    location : (x,y) pair   (technically called a tuple)
+      location on the maze path
+
+    Returns
+    -------
+    List of directions that are open in the maze path at this location, 
+      For example, ['l', 'r', 't'] would indicated that the maze path is open
+      to the left, right, and top of the current location.  If 'b' were present,
+      this represents below.
+
+    Notes
+    -----
+    If the location is not on the maze, False is returned
+    '''
+
+    for point, borders in self.maze_path:
+      if (point[0] == location[0]) and (point[1] == location[1]):
+        open_directions = []
+        for direction in ['l', 'r', 't', 'b']:
+          if direction not in borders:
+            open_directions.append(direction)
+        #
+        return open_directions
+
+    # This location not found on the maze, so returning False
+    return False
+
   def generate_maze1(self):
     '''
     Generate Maze 1 using a stored design.  This simplest maze leads to the 
@@ -322,7 +355,7 @@ class create_maze:
     '''
     
     path = []
-    path.append( ((0,0), ('t', 'b')) )
+    path.append( ((0,0), ('t', 'b','l')) )
     path.append( ((1,0), ('t', 'b')) )
     path.append( ((2,0), ('t', 'b')) )
     path.append( ((3,0), ('t', 'b')) )
@@ -995,7 +1028,7 @@ class turtle_generator:
     -------
     True or False (technically called a Boolean)
       True is returned if the pond is to the right of you
-      False is returned if the pond is to the right of you
+      False is returned if the pond is not to the right of you
     '''
     
     # Check that the turtle has been initialized and moved
@@ -1028,7 +1061,7 @@ class turtle_generator:
     -------
     True or False (technically called a Boolean)
       True is returned if the pond is to the left of you
-      False is returned if the pond is to the left of you
+      False is returned if the pond is not to the left of you
     '''
     
     # Check that the turtle has been initialized and moved
@@ -1049,6 +1082,180 @@ class turtle_generator:
     else:
       return False
 
+  def is_path_below(self):
+    '''
+    Return True or False, whether the maze path leads below from the current turtle location.
+    Note that the maze path can be open in multiple directions
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    True or False (technically called a Boolean)
+      True is returned if the maze path leads below from the current turtle location
+      False is returned if the maze path does not below above from the current turtle location
+    '''
+    
+    # Check that the turtle has been initialized and moved
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
+      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+      return
+    
+    # Check that a maze has been chosen
+    if self.maze_number == False:
+      print("You did not give a maze number when creating this turtle, so you can't ask questions about how to follow a maze path.")
+
+    # Get current location and current maze
+    current_loc = self.movements[-1]
+    # Note, we don't plot the maze, so we pass in None for the ax
+    maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
+
+    open_directions = maze.find_open_directions(current_loc)
+    
+    if open_directions == False:
+      print("Your turtle has left the maze path, so you can't ask questions about how to follow the maze path")
+      return None
+
+    for direction in open_directions:
+      # 'b' stands for below (bottom)
+      if direction == 'b':
+        return True
+    
+    return False
+
+
+  def is_path_above(self):
+    '''
+    Return True or False, whether the maze path leads above from the current turtle location.
+    Note that the maze path can be open in multiple directions
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    True or False (technically called a Boolean)
+      True is returned if the maze path leads above from the current turtle location
+      False is returned if the maze path does not lead above from the current turtle location
+    '''
+    
+    # Check that the turtle has been initialized and moved
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
+      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+      return
+    
+    # Check that a maze has been chosen
+    if self.maze_number == False:
+      print("You did not give a maze number when creating this turtle, so you can't ask questions about how to follow a maze path.")
+
+    # Get current location and current maze
+    current_loc = self.movements[-1]
+    # Note, we don't plot the maze, so we pass in None for the ax
+    maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
+
+    open_directions = maze.find_open_directions(current_loc)
+    
+    if open_directions == False:
+      print("Your turtle has left the maze path, so you can't ask questions about how to follow the maze path")
+      return None
+
+    for direction in open_directions:
+      # 't' stands for open above (top)
+      if direction == 't':
+        return True
+    
+    return False
+
+
+  def is_path_to_right(self):
+    '''
+    Return True or False, whether the maze path leads to the right of the current turtle location.
+    Note that the maze path can be open in multiple directions
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    True or False (technically called a Boolean)
+      True is returned if the maze path leads to the right of the current turtle location.
+      False is returned if the maze path does not lead to the right of the current turtle location.
+    '''
+    
+    # Check that the turtle has been initialized and moved
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
+      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+      return
+    
+    # Check that a maze has been chosen
+    if self.maze_number == False:
+      print("You did not give a maze number when creating this turtle, so you can't ask questions about how to follow a maze path.")
+
+    # Get current location and current maze
+    current_loc = self.movements[-1]
+    # Note, we don't plot the maze, so we pass in None for the ax
+    maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
+
+    open_directions = maze.find_open_directions(current_loc)
+    
+    if open_directions == False:
+      print("Your turtle has left the maze path, so you can't ask questions about how to follow the maze path")
+      return None
+
+    for direction in open_directions:
+      # 'r' stands for right
+      if direction == 'r':
+        return True
+    
+    return False
+
+
+  def is_path_to_left(self):
+    '''
+    Return True or False, whether the maze path leads to the left of the current turtle location.
+    Note that the maze path can be open in multiple directions
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    True or False (technically called a Boolean)
+      True is returned if the maze path leads to the left of the current turtle location.
+      False is returned if the maze path does not lead to the left of the current turtle location.
+    '''
+    
+    # Check that the turtle has been initialized and moved
+    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
+      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+      return
+    
+    # Check that a maze has been chosen
+    if self.maze_number == False:
+      print("You did not give a maze number when creating this turtle, so you can't ask questions about how to follow a maze path.")
+
+    # Get current location and current maze
+    current_loc = self.movements[-1]
+    # Note, we don't plot the maze, so we pass in None for the ax
+    maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
+
+    open_directions = maze.find_open_directions(current_loc)
+    
+    if open_directions == False:
+      print("Your turtle has left the maze path, so you can't ask questions about how to follow the maze path")
+      return None
+
+    for direction in open_directions:
+      # 'l' stands for left
+      if direction == 'l':
+        return True
+    
+    return False
 
   def watch_me_move(self):
     '''
