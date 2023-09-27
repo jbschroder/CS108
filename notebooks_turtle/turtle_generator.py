@@ -392,24 +392,266 @@ class create_maze:
 
   # insert maze 2, 3, 4, and so on...
   
+##
+# Begin helper class that defines a simple individual turtle
+##
+  
+class turtle:
+
+  start_location = None    # The turtle starts at this grid location
+  movements = None         # List of spatial locations for turtle to move through
+  leave_trail = None       # List of same length as movements, boolean values, if True, 
+                           #  turtle leaves a trail in that square for plotting, else, no trail is left
+
+  def __init__(self, start_location=(0,0)):
+    '''
+    Creates a simple individual turtle object. Individual turtles are controlled and 
+    managed through the turtle_generator object
+
+    Parameters
+    ----------
+
+    start_location : pair of numbers (technically called a tuple)
+      This defines the starting location for the turtle, like (0,0), or (2,2)
+      This location should be on the grid, and not outside the grid.
+
+    Returns
+    -------
+    A new single turtle for moving around 
+
+    Example
+    -------
+    turtle = turtle()
+
+    '''
+
+    # Initialize starting location
+    self.start_location = start_location
+
+    # Initialize list of movements and turtle trail markings.
+    self.movements = [ start_location ]
+    self.leave_trail = [ False ]
+
+  def current_location(self):
+    '''
+    Return the turtle's current location
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    Current location for this turtle in terms of (x,y) coordinates
+      For instance, if (4,5) is returned, then the turtle is at location 4 in
+      the x-direction and 5 in the y-direction
+    '''
+
+    return tuple(self.movements[-1])
+
+  def undo_last_move(self):
+    '''
+    Undo the last move by this turtle
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    Updates the turtle's movements internally to undo (erase) the last move
+    '''
+    if (len(self.movements) == 0) or (len(self.leave_trail) == 0):
+      print("You don't have any more moves to undo!  Skipping this")
+      return
+
+    self.movements.pop()
+    self.leave_trail.pop()
+
+  def get_movements_and_trail(self):
+    '''
+    Return copy of the turtle's movements and trail
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    Two values, movemements and trail
+      movements is a list of all the spatial locations the turtle has moved
+      through, like [(0,0), (1,0), (2,0), (3,0)] represents moving in a 
+      horizontal line
+      
+      trail is a list of True and False values, like [False, True, True,
+      False].  Here, the turtle has left a visible trail in the second and
+      third squares, but not the initial or final square.
+    '''
+
+    return list(self.movements), list(self.leave_trail) 
+
+
+  def move_left(self, leave_trail=False):
+    '''
+    Move turtle to the left by one square
+
+    Parameters
+    ----------
+    leave_trail : True or False (technically called a Boolean)
+      True: will leave a marked trail by the turtle
+      False: will not leave a market trail here by the turtle
+
+    Returns
+    -------
+    This turtle's list of movements is modified by adding a new location at
+    the end, such that the turtle will move one square to the left
+
+    Example
+    --------
+    If       turtle.movements = [(2,2)]
+    Then     turtle.move_left()
+    Updates  turtle.movements = [(2,2), (1,2)]
+    '''
+
+    last_x, last_y = self.movements[-1]
+    new_location = (last_x-1, last_y)
+    self.movements.append(new_location)
+    self.leave_trail.append(leave_trail)
+    
+  def move_right(self, leave_trail=False):
+    '''
+    Move turtle to the right by one square
+
+    Parameters
+    ----------
+    leave_trail : True or False (technically called a Boolean)
+      True: will leave a marked trail by the turtle
+      False: will not leave a market trail here by the turtle
+
+    Returns
+    -------
+    This turtle's list of movements is modified by adding a new location at
+    the end, such that the turtle will move one square to the right
+
+    Example
+    --------
+    If       turtle.movements = [(2,2)]
+    Then     turtle.move_right()
+    Updates  turtle.movements = [(2,2), (3,2)]
+    '''
+    last_x, last_y = self.movements[-1]
+    new_location = (last_x+1, last_y)
+    self.movements.append(new_location)
+    self.leave_trail.append(leave_trail)
+
+  def move_up(self, leave_trail=False):
+    '''
+    Move turtle up by one square
+
+    Parameters
+    ----------
+    leave_trail : True or False (technically called a Boolean)
+    True: will leave a marked trail by the turtle
+    False: will not leave a market trail here by the turtle
+
+    Returns
+    -------
+    This turtle's list of movements is modified by adding a new location at
+    the end, such that the turtle will move one square up
+
+    Example
+    --------
+    If       turtle.movements = [(2,2)]
+    Then     turtle.move_up()
+    Updates  turtle.movements = [(2,2), (2,3)]
+    '''
+    last_x, last_y = self.movements[-1]
+    new_location = (last_x, last_y+1)
+    self.movements.append(new_location)
+    self.leave_trail.append(leave_trail)
+
+  def move_down(self, leave_trail=False):
+    '''
+    Move turtle down by one square
+
+    Parameters
+    ----------
+    leave_trail : True or False (technically called a Boolean)
+    True: will leave a marked trail by the turtle
+    False: will not leave a market trail here by the turtle
+
+
+    Returns
+    -------
+    This turtle's list of movements is modified by adding a new location at
+    the end, such that the turtle will move one square donw
+
+    Example
+    --------
+    If       turtle.movements = [(2,2)]
+    Then     turtle.move_down()
+    Updates  turtle.movements = [(2,2), (2,1)]
+    '''
+    last_x, last_y = self.movements[-1]
+    new_location = (last_x, last_y-1)
+    self.movements.append(new_location)
+    self.leave_trail.append(leave_trail)
+
+  def check_continuous_movements(self):
+    '''
+    Check whether the turtle's movements are all continuous, i.e., the movements 
+    don't skip or jump over squares (which would not be fair)
+    
+
+    Parameters
+    --------
+    None
+
+    Returns
+    --------
+    True or False (technically called a Boolean)
+      True is returned if the turtle's movements are all continuous and don't skip any squares 
+      False is returned if some square(s) are skipped over
+
+    Example
+    -------
+    turtle.check_continuous_movements()
+    '''
+        
+    movements_continuous = True
+    old_movement = self.movements[0]
+    for new_movement in self.movements[1:]:
+      
+      # check step size is only one square
+      step_size = abs(old_movement[0] - new_movement[0]) + abs(old_movement[1] - new_movement[1])
+      if (step_size != 1) and (step_size != 0):
+        movements_continuous = False
+        print("Movement not continuous from " + str(old_movement) + " to " + str(new_movement) + ". You probably jumped a square.")
+        break
+      
+      old_movement = new_movement
+
+    return movements_continuous
+
   
 ##
-# Begin Turtle Class (uses maze class)
+# Begin Turtle Class (manages using multiple turtles, and uses maze class)
 ##
   
 class turtle_generator:
 
-  nx = None             # Number of squares in the grid horizontally
-  ny  = None            # Number of squares in the grid vertically
-  start_location = None # The turtle starts at this grid location
-  maze_number = None    # True or False, controlling whether the maze is plotted
-  pond_location = None  # The pond will be centered at this grid location
-  movements = None      # List of spatial locations for turtle to move through
-  leave_trail = None    # List of same length as movements, boolean values, if True, 
-                        #  turtle leaves a trail in that square for plotting, else, not trail is left
+  nx = None                # Number of squares in the grid horizontally
+  ny  = None               # Number of squares in the grid vertically
+  start_location = None    # The turtle starts at this grid location
+  maze_number = None       # True or False, controlling whether the maze is plotted
+  pond_location = None     # The pond will be centered at this grid location
+  turtles = None           # List of individual turtles
+  number_of_turtles = None # Number of turtles to model (currently tested for only a couple)a
+  turtle_tape = None       # List indicating which turtle moved, when, e.g., [0, 0, 1] indicates
+                           #   that turtle 0 moved twice, and then turtle 1 moved once
 
   def __init__(self, nx=14, ny=14, start_location=(0,0), maze_number=False,
-               pond_location=False):
+               pond_location=False, number_of_turtles=1):
     '''
     Creates a turtle object, can use other function to move it on the grid and
     plot the background grid and maze for the turtle to explore
@@ -435,6 +677,9 @@ class turtle_generator:
       If pond_location is a pair of numbers (technially called a tuple), then
       this defines the pond location on the grid, like (12, 12) or (5,6).
       This location should be on the grid, and not outside the grid.
+    
+    number_of_turtles : single number (like 1, 2 or 3), this number sets the 
+      number of turtles to model
 
     Returns
     -------
@@ -459,6 +704,13 @@ class turtle_generator:
     else:
       self.ny = 14
       print("Invalid ny value given. ny should be a positive integer. Using default ny=14 instead")
+
+    # Set number of turtles: check that the user's desired number_of_turtles is a positive integer
+    if (type(number_of_turtles) == int) and (number_of_turtles > 0):
+      self.number_of_turtles = number_of_turtles
+    else:
+      self.number_of_turtles = 1
+      print("Invalid number_of_turtles value given; number_of_turtles should be a positive integer. Using default value of 1 instead")
 
     # Set start_location: check that user's desired start_location is a valid location on the grid
     if self.is_location_on_grid(start_location):
@@ -541,7 +793,7 @@ class turtle_generator:
 
   def start_new_journey(self):
     '''
-    Get the turtle all ready to start a new journey beginning at the turtle's
+    Get all the turtles ready to start a new journey, beginning at the
     start location
 
     Parameters
@@ -550,138 +802,150 @@ class turtle_generator:
 
     Returns
     -------
-    The turtle is updated internally for a new journey beginning at
-    the turtle's start location
+    The turtle generator is updated internally so that each turtle is ready 
+    for a new journey beginning at the start location
     '''
-    self.movements = [self.start_location]
-    self.leave_trail = [False]
+    
+    self.turtles = [ turtle(self.start_location) for k in range(self.number_of_turtles) ]
+    self.turtle_tape = []
 
-  def move_left(self, leave_trail=False):
+  def move_left(self, leave_trail=False, which_turtle=0):
     '''
     Move turtle to the left by one square
 
     Parameters
     ----------
+    which_turtle : number (such as 1, 2, or 3), which specifies which turtle 
+      is starting a new journey
+    
     leave_trail : True or False (technically called a Boolean)
-    True: will leave a marked trail by the turtle
-    False: will not leave a market trail here by the turtle
+      True: will leave a marked trail by the turtle
+      False: will not leave a market trail here by the turtle
 
     Returns
     -------
-    This turtle's list of movements is modified by adding a new location at
-    the end, such that the turtle will move one square to the left
-
-    Example
-    --------
-    If       turtle.movements = [(2,2)]
-    Then     turtle.move_left()
-    Updates  turtle.movements = [(2,2), (1,2)]
+    The turtle numbered "which_turtle" is moved one square to the left
+      For example, if the turtle was at location (2,2), then it would move to location (1,2) 
     '''
+    
+    if (type(which_turtle) != int) or (which_turtle < 0) or (which_turtle > self.number_of_turtles-1):
+      print("which_turtle must equal a valid turtle number. You have " + str(self.number_of_turtles) + \
+            " total turtles to work with, numbered starting at 0.  You entered " + str(which_turtle) + \
+            " thus this operation cannot be completed.")
+
     try:
-      last_x, last_y = self.movements[-1]
-      new_location = (last_x-1, last_y)
-      if self.is_location_on_grid(new_location):
-        self.movements.append(new_location)
-        self.leave_trail.append(leave_trail)
-      else:
+      self.turtles[which_turtle].move_left()
+      new_location = self.turtles[which_turtle].current_location()
+      if not self.is_location_on_grid(new_location):
+        self.turtles[which_turtle].undo_last_move()
         print("You tried to move off the grid to location " + str(new_location) + ".  Ignoring this move.")
+      else:
+        self.turtle_tape.append(which_turtle)
     except:
       raise ValueError("You need to call start_new_journey first")
 
-  def move_right(self, leave_trail=False):
+  def move_right(self, leave_trail=False, which_turtle=0):
     '''
     Move turtle to the right by one square
 
     Parameters
     ----------
+    which_turtle : number (such as 1, 2, or 3), which specifies which turtle 
+      is starting a new journey
+    
     leave_trail : True or False (technically called a Boolean)
-    True: will leave a marked trail by the turtle
-    False: will not leave a market trail here by the turtle
+      True: will leave a marked trail by the turtle
+      False: will not leave a market trail here by the turtle
 
     Returns
     -------
-    This turtle's list of movements is modified by adding a new location at
-    the end, such that the turtle will move one square to the right
-
-    Example
-    --------
-    If       turtle.movements = [(2,2)]
-    Then     turtle.move_right()
-    Updates  turtle.movements = [(2,2), (3,2)]
+    The turtle numbered "which_turtle" is moved one square to the right
+      For example, if the turtle was at location (2,2), then it would move to location (3,2) 
     '''
+    
+    if (type(which_turtle) != int) or (which_turtle < 0) or (which_turtle > self.number_of_turtles-1):
+      print("which_turtle must equal a valid turtle number. You have " + str(self.number_of_turtles) + \
+            " total turtles to work with, numbered starting at 0.  You entered " + str(which_turtle) + \
+            " thus this operation cannot be completed.")
+
     try:
-      last_x, last_y = self.movements[-1]
-      new_location = (last_x+1, last_y)
-      if self.is_location_on_grid(new_location):
-        self.movements.append(new_location)
-        self.leave_trail.append(leave_trail)
-      else:
+      self.turtles[which_turtle].move_right()
+      new_location = self.turtles[which_turtle].current_location()
+      if not self.is_location_on_grid(new_location):
+        self.turtles[which_turtle].undo_last_move()
         print("You tried to move off the grid to location " + str(new_location) + ".  Ignoring this move.")
+      else:
+        self.turtle_tape.append(which_turtle)
     except:
       raise ValueError("You need to call start_new_journey first")
 
-  def move_up(self, leave_trail=False):
+  def move_up(self, leave_trail=False, which_turtle=0):
     '''
     Move turtle up by one square
 
     Parameters
     ----------
+    which_turtle : number (such as 1, 2, or 3), which specifies which turtle 
+      is starting a new journey
+    
     leave_trail : True or False (technically called a Boolean)
-    True: will leave a marked trail by the turtle
-    False: will not leave a market trail here by the turtle
+      True: will leave a marked trail by the turtle
+      False: will not leave a market trail here by the turtle
 
     Returns
     -------
-    This turtle's list of movements is modified by adding a new location at
-    the end, such that the turtle will move one square up
-
-    Example
-    --------
-    If       turtle.movements = [(2,2)]
-    Then     turtle.move_up()
-    Updates  turtle.movements = [(2,2), (2,3)]
+    The turtle numbered "which_turtle" is moved one square to the right
+      For example, if the turtle was at location (2,2), then it would move to location (2,3) 
     '''
+    
+    if (type(which_turtle) != int) or (which_turtle < 0) or (which_turtle > self.number_of_turtles-1):
+      print("which_turtle must equal a valid turtle number. You have " + str(self.number_of_turtles) + \
+            " total turtles to work with, numbered starting at 0.  You entered " + str(which_turtle) + \
+            " thus this operation cannot be completed.")
+
     try:
-      last_x, last_y = self.movements[-1]
-      new_location = (last_x, last_y+1)
-      if self.is_location_on_grid(new_location):
-        self.movements.append(new_location)
-        self.leave_trail.append(leave_trail)
-      else:
+      self.turtles[which_turtle].move_up()
+      new_location = self.turtles[which_turtle].current_location()
+      if not self.is_location_on_grid(new_location):
+        self.turtles[which_turtle].undo_last_move()
         print("You tried to move off the grid to location " + str(new_location) + ".  Ignoring this move.")
+      else:
+        self.turtle_tape.append(which_turtle)
     except:
       raise ValueError("You need to call start_new_journey first")
 
-  def move_down(self, leave_trail=False):
+  def move_down(self, leave_trail=False, which_turtle=0):
     '''
     Move turtle down by one square
 
     Parameters
     ----------
+    which_turtle : number (such as 1, 2, or 3), which specifies which turtle 
+      is starting a new journey
+    
     leave_trail : True or False (technically called a Boolean)
-    True: will leave a marked trail by the turtle
-    False: will not leave a market trail here by the turtle
-
+      True: will leave a marked trail by the turtle
+      False: will not leave a market trail here by the turtle
 
     Returns
     -------
-    This turtle's list of movements is modified by adding a new location at
-    the end, such that the turtle will move one square donw
-
-    Example
-    --------
-    If       turtle.movements = [(2,2)]
-    Then     turtle.move_down()
-    Updates  turtle.movements = [(2,2), (2,1)]
+    The turtle numbered "which_turtle" is moved one square to the right
+      For example, if the turtle was at location (2,2), then it would move to location (2,1) 
     '''
+    
+    if (type(which_turtle) != int) or (which_turtle < 0) or (which_turtle > self.number_of_turtles-1):
+      print("which_turtle must equal a valid turtle number. You have " + str(self.number_of_turtles) + \
+            " total turtles to work with, numbered starting at 0.  You entered " + str(which_turtle) + \
+            " thus this operation cannot be completed.")
+
     try:
-      last_x, last_y = self.movements[-1]
-      new_location = (last_x, last_y-1)
-      if self.is_location_on_grid(new_location):
-        self.movements.append(new_location)
-        self.leave_trail.append(leave_trail)
-      else:
+      self.turtles[which_turtle].move_down()
+      new_location = self.turtles[which_turtle].current_location()
+      if not self.is_location_on_grid(new_location):
+        self.turtles[which_turtle].undo_last_move()
         print("You tried to move off the grid to location " + str(new_location) + ".  Ignoring this move.")
+      else:
+        self.turtle_tape.append(which_turtle)
     except:
       raise ValueError("You need to call start_new_journey first")
 
@@ -723,28 +987,28 @@ class turtle_generator:
     plt.yticks(range(self.ny), fontsize=15)
 
 
-  def check_stayed_on_maze_path(self):
+  def check_stayed_on_maze_path(self, which_turtle=0):
     '''
     Check whether turtle stayed on maze path
 
     Parameters
     --------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check 
 
     Returns
     --------
     True or False (technically called a Boolean)
-    True is returned if the turtle always stayed on the maze path. 
-    False is returned if the turtle stepped off the path at some point
+      True is returned if the turtle always stayed on the maze path. 
+      False is returned if the turtle stepped off the path at some point
 
     Example
     -------
     turtle.check_stayed_on_maze_path()
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
     if self.maze_number == False:
@@ -754,30 +1018,31 @@ class turtle_generator:
     # Note, we don't plot the maze, so we pass in None for the ax
     maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
     
-    return maze.check_path_stays_on_maze(self.movements)
+    movements, trail = self.turtles[which_turtle].get_movements_and_trail()
+    return maze.check_path_stays_on_maze(movements)
     
-  def check_reached_maze_goal(self):
+  def check_reached_maze_goal(self, which_turtle=0):
     '''
     Check whether turtle reaches the maze goal, for instance, reaches the pond or food
 
     Parameters
     --------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check 
 
     Returns
     --------
     True or False (technically called a Boolean)
-    True is returned if the turtle reaches the maze goal, for instance, reaches the pond or food
-    False is returned if the turtle never reaches the goal 
+      True is returned if the turtle reaches the maze goal, for instance, reaches the pond or food
+      False is returned if the turtle never reaches the goal 
 
     Example
     -------
     turtle.check_reached_maze_goal()
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
     if self.maze_number == False:
@@ -787,9 +1052,10 @@ class turtle_generator:
     # Note, we don't plot the maze, so we pass in None for the ax
     maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
     
-    return maze.check_path_includes_goal(self.movements)  
+    movements, trail = self.turtles[which_turtle].get_movements_and_trail()
+    return maze.check_path_includes_goal(movements)  
 
-  def check_continuous_movements(self):
+  def check_continuous_movements(self, which_turtle=0):
     '''
     Check whether turtle's movements are all continuous, i.e., the movements 
     don't skip or jump over squares (which would not be fair)
@@ -797,74 +1063,61 @@ class turtle_generator:
 
     Parameters
     --------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check 
 
     Returns
     --------
     True or False (technically called a Boolean)
-    True is returned if the turtle's movements are all continuous and don't skip any squares 
-    False is returned if some square(s) are skipped over
+      True is returned if the turtle's movements are all continuous and don't skip any squares 
+      False is returned if some square(s) are skipped over
 
     Example
     -------
     turtle.check_continuous_movements()
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
-    movements_continuous = True
-    old_movement = self.movements[0]
-    for new_movement in self.movements[1:]:
-      
-      # check step size is only one square
-      step_size = abs(old_movement[0] - new_movement[0]) + abs(old_movement[1] - new_movement[1])
-      if (step_size != 1) and (step_size != 0):
-        movements_continuous = False
-        print("Movement not continuous from " + str(old_movement) + " to " + str(new_movement) + ". You probably jumped a square.")
-        break
-      
-      old_movement = new_movement
+    return self.turtles[which_turtle].check_continuous_movements()
 
-    return movements_continuous
-
-  def check_maze_completed(self):
+  def check_maze_completed(self, which_turtle=0):
     '''
     Check whether turtle completed the maze
 
     Parameters
     --------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check 
 
     Returns
     --------
     True or False (technically called a Boolean)
-    True is returned if the turtle successfully completes the maze by doing the following:
-      Stay inside maze path
-      Uses continuous movements from start to finish (no skipping squares or cheating)
-      Reaches the maze goal
+      True is returned if the turtle successfully completes the maze by doing the following:
+       - Stay inside maze path
+       - Uses continuous movements from start to finish (no skipping squares or cheating)
+       - Reaches the maze goal
     
-    False is returned if the turtle fails either of the above conditions
+      False is returned if the turtle fails either of the above conditions
 
     Example
     -------
     turtle.check_maze_completed()
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
     if self.maze_number == False:
       print("You did not give a maze number when creating this turtle, so you can't check whether the turtle finished the maze.")
       return None
     
-    if self.check_continuous_movements():
-      if self.check_reached_maze_goal():
-        if self.check_stayed_on_maze_path():
+    if self.check_continuous_movements(which_turtle):
+      if self.check_reached_maze_goal(which_turtle):
+        if self.check_stayed_on_maze_path(which_turtle):
           return True
         else:
           print("Turtle did not stay on maze path")
@@ -876,44 +1129,45 @@ class turtle_generator:
     return False
     
 
-  def check_maze_completed_with_shortest_path(self):
+  def check_maze_completed_with_shortest_path(self, which_turtle=0):
     '''
     Check whether turtle completed the maze using the shortest path and a starting position of (0,0)
 
     Parameters
     --------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check 
 
     Returns
     --------
     True or False (technically called a Boolean)
-    True is returned if the turtle successfully completes the maze by doing the following:
-      Uses continuous movements from start to finish (no skipping squares or cheating)
-      Reaches the maze goal
-      Starts at position (0,0)
-      Uses the shortest path from (0,0) to the maze goal
-    
-    False is returned if the turtle fails any of the above conditions
+      True is returned if the turtle successfully completes the maze by doing the following:
+        - Uses continuous movements from start to finish (no skipping squares or cheating)
+        - Reaches the maze goal
+        - Starts at position (0,0)
+        - Uses the shortest path from (0,0) to the maze goal
+      
+      False is returned if the turtle fails any of the above conditions
 
     Example
     -------
     turtle.check_maze_completed_with_shortest_path()
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
     if self.maze_number == False:
       print("You did not give a maze number when creating this turtle, so you can't check whether the turtle finished the maze.")
       return None    
     
-    if self.check_maze_completed():
-      if self.movements[0] == (0,0):
+    if self.check_maze_completed(which_turtle):
+      movements, trail = self.turtles[which_turtle].get_movements_and_trail()
+      if movements[0] == (0,0):
         # Note, we don't plot the maze, so we pass in None for the ax
         maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
-        if len(self.movements) == maze.get_shortest_path_length():
+        if len(movements) == maze.get_shortest_path_length():
           return True
         else:
           print("Did not use shortest path.  Your path was length " + str(len(self.movements)) + ". The shortest path was " + str(maze.get_shortest_path_length()))
@@ -922,7 +1176,7 @@ class turtle_generator:
     
     return False
 
-  def plot_trail(self, ax, t):
+  def plot_trail(self, ax, t, which_turtle=0):
     '''
     Plot the turtle's trail at all the locations specified by a move_* command
 
@@ -930,7 +1184,10 @@ class turtle_generator:
     ----------
     ax : graphical/plotting axes, generated with
         fig, ax = plt.subplots()
+
     t : number, indicating the number of total movements where we plot a trail
+
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to plot
 
     Returns
     -------
@@ -940,23 +1197,27 @@ class turtle_generator:
     if type(t) != int:
       print("Must request integer number of movements when plotting a trail")
       return None
-    if t > len(self.movements) or t > len(self.leave_trail):
-      print("You have requested too many movements to plot a trail for.  You only have " + str(len(self.movements)) + " stored movements")
+    
+    # retrieve this turtle's list of movements
+    movements, trail = self.turtles[which_turtle].get_movements_and_trail()
+
+    if t > len(movements) or t > len(leave_trail):
+      print("You have requested too many movements to plot a trail for.  You only have " + str(len(movements)) + " stored movements")
 
     for i in range(t):
       if self.leave_trail[i]:
-        move = self.movements[i]
+        move = movements[i]
         x_loc = move[0]
         y_loc = move[1]
         ax.fill_between([x_loc-0.5, x_loc+0.5], [y_loc-0.5, y_loc-0.5], [y_loc+0.5, y_loc+0.5], color='green')
 
-  def is_pond_above(self):
+  def is_pond_above(self, which_turtle=0):
     '''
     Return True or False, whether the pond is above the current turtle location
 
     Parameters
     ----------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check about the pond location
 
     Returns
     -------
@@ -965,9 +1226,9 @@ class turtle_generator:
       False is returned if the pond is not above you
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
     # Check that the pond location is set
@@ -975,7 +1236,7 @@ class turtle_generator:
       print("You didn't specify a pond location when creating the turtle.  So, I can't answer this question about the pond.") 
       return
 
-    current_loc = self.movements[-1]
+    current_loc = self.turtles[which_turtle].current_location()
     pond_loc = self.pond_location
 
     if current_loc[1] < pond_loc[1]:
@@ -983,13 +1244,13 @@ class turtle_generator:
     else:
       return False
   
-  def is_pond_below(self):
+  def is_pond_below(self, which_turtle=0):
     '''
     Return True or False, whether the pond is below the current turtle location
 
     Parameters
     ----------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check about the pond location
 
     Returns
     -------
@@ -998,9 +1259,9 @@ class turtle_generator:
       False is returned if the pond is not below you
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
     # Check that the pond location is set
@@ -1008,7 +1269,7 @@ class turtle_generator:
       print("You didn't specify a pond location when creating the turtle.  So, I can't answer this question about the pond.") 
       return
 
-    current_loc = self.movements[-1]
+    current_loc = self.turtles[which_turtle].current_location()
     pond_loc = self.pond_location
 
     if current_loc[1] > pond_loc[1]:
@@ -1016,13 +1277,13 @@ class turtle_generator:
     else:
       return False
 
-  def is_pond_to_right(self):
+  def is_pond_to_right(self, which_turtle=0):
     '''
     Return True or False, whether the pond is to the right of the current turtle location
 
     Parameters
     ----------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check about the pond location
 
     Returns
     -------
@@ -1031,9 +1292,9 @@ class turtle_generator:
       False is returned if the pond is not to the right of you
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
     # Check that the pond location is set
@@ -1041,7 +1302,7 @@ class turtle_generator:
       print("You didn't specify a pond location when creating the turtle.  So, I can't answer this question about the pond.") 
       return
 
-    current_loc = self.movements[-1]
+    current_loc = self.turtles[which_turtle].current_location()
     pond_loc = self.pond_location
 
     if current_loc[0] < pond_loc[0]:
@@ -1049,13 +1310,13 @@ class turtle_generator:
     else:
       return False
 
-  def is_pond_to_left(self):
+  def is_pond_to_left(self, which_turtle=0):
     '''
     Return True or False, whether the pond is to the left of the current turtle location
 
     Parameters
     ----------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check about the pond location
 
     Returns
     -------
@@ -1064,9 +1325,9 @@ class turtle_generator:
       False is returned if the pond is not to the left of you
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
     # Check that the pond location is set
@@ -1074,7 +1335,7 @@ class turtle_generator:
       print("You didn't specify a pond location when creating the turtle.  So, I can't answer this question about the pond.") 
       return
 
-    current_loc = self.movements[-1]
+    current_loc = self.turtles[which_turtle].current_location()
     pond_loc = self.pond_location
 
     if current_loc[0] > pond_loc[0]:
@@ -1082,14 +1343,14 @@ class turtle_generator:
     else:
       return False
 
-  def is_path_below(self):
+  def is_path_below(self, which_turtle=0):
     '''
     Return True or False, whether the maze path leads below from the current turtle location.
     Note that the maze path can be open in multiple directions
 
     Parameters
     ----------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check about the path location
 
     Returns
     -------
@@ -1098,9 +1359,9 @@ class turtle_generator:
       False is returned if the maze path does not below above from the current turtle location
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
     # Check that a maze has been chosen
@@ -1108,7 +1369,7 @@ class turtle_generator:
       print("You did not give a maze number when creating this turtle, so you can't ask questions about how to follow a maze path.")
 
     # Get current location and current maze
-    current_loc = self.movements[-1]
+    current_loc = self.turtles[which_turtle].current_location()
     # Note, we don't plot the maze, so we pass in None for the ax
     maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
 
@@ -1126,14 +1387,14 @@ class turtle_generator:
     return False
 
 
-  def is_path_above(self):
+  def is_path_above(self, which_turtle=0):
     '''
     Return True or False, whether the maze path leads above from the current turtle location.
     Note that the maze path can be open in multiple directions
 
     Parameters
     ----------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check about the path location
 
     Returns
     -------
@@ -1142,9 +1403,9 @@ class turtle_generator:
       False is returned if the maze path does not lead above from the current turtle location
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
     # Check that a maze has been chosen
@@ -1152,7 +1413,7 @@ class turtle_generator:
       print("You did not give a maze number when creating this turtle, so you can't ask questions about how to follow a maze path.")
 
     # Get current location and current maze
-    current_loc = self.movements[-1]
+    current_loc = self.turtles[which_turtle].current_location()
     # Note, we don't plot the maze, so we pass in None for the ax
     maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
 
@@ -1170,14 +1431,14 @@ class turtle_generator:
     return False
 
 
-  def is_path_to_right(self):
+  def is_path_to_right(self, which_turtle=0):
     '''
     Return True or False, whether the maze path leads to the right of the current turtle location.
     Note that the maze path can be open in multiple directions
 
     Parameters
     ----------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check about the path location
 
     Returns
     -------
@@ -1186,9 +1447,9 @@ class turtle_generator:
       False is returned if the maze path does not lead to the right of the current turtle location.
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
     # Check that a maze has been chosen
@@ -1196,7 +1457,7 @@ class turtle_generator:
       print("You did not give a maze number when creating this turtle, so you can't ask questions about how to follow a maze path.")
 
     # Get current location and current maze
-    current_loc = self.movements[-1]
+    current_loc = self.turtles[which_turtle].current_location()
     # Note, we don't plot the maze, so we pass in None for the ax
     maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
 
@@ -1214,14 +1475,14 @@ class turtle_generator:
     return False
 
 
-  def is_path_to_left(self):
+  def is_path_to_left(self, which_turtle=0):
     '''
     Return True or False, whether the maze path leads to the left of the current turtle location.
     Note that the maze path can be open in multiple directions
 
     Parameters
     ----------
-    None
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle to check about the path location
 
     Returns
     -------
@@ -1230,9 +1491,9 @@ class turtle_generator:
       False is returned if the maze path does not lead to the left of the current turtle location.
     '''
     
-    # Check that the turtle has been initialized and moved
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
     # Check that a maze has been chosen
@@ -1240,7 +1501,7 @@ class turtle_generator:
       print("You did not give a maze number when creating this turtle, so you can't ask questions about how to follow a maze path.")
 
     # Get current location and current maze
-    current_loc = self.movements[-1]
+    current_loc = self.turtles[which_turtle].current_location()
     # Note, we don't plot the maze, so we pass in None for the ax
     maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
 
@@ -1272,7 +1533,7 @@ class turtle_generator:
 
     Example
     -------
-    Let turtle.movements = [(2,2), (3,3)]
+    If you have one turtle and it's list of movements is [(2,2), (3,3)]
     Then the animation will be a turtle that goes from square (2,2) to
     square (3,3) on the grid
     '''
@@ -1281,9 +1542,9 @@ class turtle_generator:
     from matplotlib.offsetbox import OffsetImage, AnnotationBbox
     import matplotlib.animation
 
-    # Check that we have actual movements to plot
-    if (not hasattr(self, 'movements')) or (self.movements == []) or (self.movements == None):
-      print("You don't have any movements yet!\n Try doing\n turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+    # Check that some turtles have been initialized
+    if ((self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
 
     # Create our blank plot
@@ -1293,14 +1554,26 @@ class turtle_generator:
     self.download_turtle_image()
     image = OffsetImage(plt.imread('./turtle.png', format="png"), zoom=0.1)
 
+    # Use this to track the current move of each turtle during the animation
+    current_moves = [ 0 for k in range(self.number_of_turtles) ]
+
     # Define helper function for animation, which draws each animation frame
     def animate(t):
       plt.cla()
-      ab = AnnotationBbox(image, self.movements[t], frameon=False)
-      ax.add_artist(ab)
       
-      # plot trail up to and including movement t
-      self.plot_trail(ax, t+1)
+      # decide which turtle is moving next (skip t == 0, as we want to plot the starting position)
+      if t > 0:
+        next_turtle = self.turtle_tape[t-1]
+        current_moves[next_turtle] = current_moves[next_turtle] + 1
+
+      for k in range(self.number_of_turtles):
+        current_loc = self.turtles[k].movements[ current_moves[k] ]
+        ab = AnnotationBbox(image, current_loc, frameon=False)
+        ax.add_artist(ab)
+      
+      for k in range(self.number_of_turtles):
+        # plot trail up to and including the last move by this turtle
+        self.plot_trail(ax, current_moves[k]+1, which_turtle)
 
       # Create maze and draw it
       maze = create_maze(ax, self.nx, self.ny, self.maze_number, self.pond_location)
@@ -1311,7 +1584,9 @@ class turtle_generator:
       plt.yticks(range(self.ny), fontsize=15)
 
     #ax.axis('equal')
-    anim = matplotlib.animation.FuncAnimation(fig, animate, frames=len(self.movements), interval=400, repeat=False)
+
+    # Note that we plot one extra frame len(self.turtle_tape)+1, so that we can show the starting position
+    anim = matplotlib.animation.FuncAnimation(fig, animate, frames=len(self.turtle_tape)+1, interval=400, repeat=False)
 
     return anim
 
