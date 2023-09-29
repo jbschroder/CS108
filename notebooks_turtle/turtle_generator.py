@@ -123,7 +123,7 @@ class create_maze:
     if linestyle == 'light':
       self.ax.plot([point1[0], point2[0]], [point1[1], point2[1]], color=(0.6, 0.6, 0.6), linewidth=1)
     elif linestyle == 'dark':
-      self.ax.plot([point1[0], point2[0]], [point1[1], point2[1]], color=(0.0, 0.0, 0.0), linewidth=3.5)
+      self.ax.plot([point1[0], point2[0]], [point1[1], point2[1]], color=(0.0, 0.0, 0.0), linewidth=3)
     else:
       print("No line drawn!  linestyle should be 'light' or 'dark' ")
 
@@ -649,6 +649,8 @@ class turtle_generator:
   number_of_turtles = None # Number of turtles to model (currently tested for only a couple)a
   turtle_tape = None       # List indicating which turtle moved, when, e.g., [0, 0, 1] indicates
                            #   that turtle 0 moved twice, and then turtle 1 moved once
+  plotting_offsets = None  # Offsets for plotting multiple turtles in a square
+  turtle_scaling = None    # Estimate on how much to scale each turtle as it's plotted on different grid sizes
 
   def __init__(self, nx=14, ny=14, start_location=(0,0), maze_number=False,
                pond_location=False, number_of_turtles=1):
@@ -733,6 +735,18 @@ class turtle_generator:
       self.pond_location = False
       print("Invalid pond_location value, should be either False (for no pond), or coordinates inside the grid like (0,0) or (2,2). Using default value False instead.")
 
+    # Set plotting offsets for multiple turtles
+    if self.number_of_turtles == 1:
+      self.plotting_offsets = [ (0,0) ]
+    elif self.number_of_turtles == 2:
+      self.plotting_offsets = [ (-0.09,0.09), (0.09,-0.09) ]
+    elif self.number_of_turtles == 3:
+      self.plotting_offsets = [ (-0.105,0.105), (0.105,0.105), (-0.105, -0.105) ]
+    elif self.number_of_turtles == 4:
+      self.plotting_offsets = [ (-0.12,0.12), (-0.12,-0.12), (0.12, -0.12), (0.12,0.12) ]
+    else:
+      raise ValueError("Only up to 4 turtles supported")
+
     # Set up plotting environment for animation
     import matplotlib.pyplot as plt
     try:
@@ -745,7 +759,12 @@ class turtle_generator:
     plt.ioff() # Turn interactive mode off
     plt.rcParams["figure.figsize"] = [7, 7]
     #plt.rcParams["figure.autolayout"] = True
-    #plt.rcParams["figure.constrained_layout.use"] = True
+
+    # Set the scaling factor so that each turtle is the right number of pixels across
+    # assumes (7,7) figsize and 72 dpi, and a turtle image that is 285 pixels across
+    # pixel_size_per_square = (image_size_in_inches * dpi / number_of_squares ) * factor to account for size of axes and labels
+    pixel_size_per_square = (7.*72. / max(self.nx, self.ny))*.76
+    self.turtle_scaling = pixel_size_per_square/285.   
 
   def is_location_on_grid(self, location):
       '''
@@ -765,8 +784,8 @@ class turtle_generator:
       '''
       if (type(location) == tuple)  and (len(location) == 2)       and \
         (type(location[0]) == int) and (type(location[1]) == int) and \
-        (location[0] >= 0)          and (location[0] <= self.nx)    and \
-        (location[1] >= 0)          and (location[1] <= self.ny):
+        (location[0] >= 0)          and (location[0] < self.nx)    and \
+        (location[1] >= 0)          and (location[1] < self.ny):
         return True
       else:
         return False
@@ -979,10 +998,14 @@ class turtle_generator:
 
     # Download turtle image for plotting, and then load that image into Python
     self.download_turtle_image()
-    image = OffsetImage(plt.imread('./turtle.png', format="png"), zoom=0.1)
+    # Shrink turtle if more than one
+    zoom = self.turtle_scaling * (1.0 / (1.0 + (self.number_of_turtles-1)*0.2))
+    image = OffsetImage(plt.imread('./turtle.png', format="png"), zoom=zoom)
 
-    ab = AnnotationBbox(image, self.start_location, frameon=False)
-    ax.add_artist(ab)
+    for k in range(self.number_of_turtles):
+      plot_location = ( self.start_location[0] + self.plotting_offsets[k][0], self.start_location[1] + self.plotting_offsets[k][1])
+      ab = AnnotationBbox(image, plot_location , frameon=False)
+      ax.add_artist(ab)
 
     # Create maze and draw it
     maze = create_maze(ax, self.nx, self.ny, self.maze_number, self.pond_location)
@@ -1169,17 +1192,23 @@ class turtle_generator:
       return None    
     
     if self.check_maze_completed(which_turtle):
-      movements, trail = self.turtles[which_turtle].get_movements_and_trail()
-      if movements[0] == (0,0):
-        # Note, we don't plot the maze, so we pass in None for the ax
-        maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
-        if len(movements) == maze.get_shortest_path_length():
-          return True
+      if not self.do_turtles_collide():
+        movements, trail = self.turtles[which_turtle].get_movements_and_trail()
+        
+        if movements[0] == (0,0):
+          # Note, we don't plot the maze, so we pass in None for the ax
+          maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
+          if len(movements) == maze.get_shortest_path_length():
+            return True
+          else:
+            print("Did not use shortest path.  Your path was length " + str(len(movements)) + ". The shortest path was " + str(maze.get_shortest_path_length()))
         else:
-          print("Did not use shortest path.  Your path was length " + str(len(movements)) + ". The shortest path was " + str(maze.get_shortest_path_length()))
+          print("Starting position was incorrect.  Should use (0,0), you instead used " + str(movements[0]) )
+      
       else:
-        print("Starting position was incorrect.  Should use (0,0), you instead used " + str(movements[0]) )
-    
+        # turtles collide prints error message
+        pass
+
     return False
 
   def plot_trail(self, ax, t, which_turtle=0):
@@ -1204,6 +1233,10 @@ class turtle_generator:
       print("Must request integer number of movements when plotting a trail")
       return None
     
+
+    colors = [(0.4, 0.804, 0.6666), (0.804, 0.2, 0.2), (0.271, 0.545, 0), (0.604, 0.196, 0.804)]
+    color = colors[which_turtle]
+
     # retrieve this turtle's list of movements
     movements, leave_trail = self.turtles[which_turtle].get_movements_and_trail()
 
@@ -1215,7 +1248,7 @@ class turtle_generator:
         move = movements[i]
         x_loc = move[0]
         y_loc = move[1]
-        ax.fill_between([x_loc-0.5, x_loc+0.5], [y_loc-0.5, y_loc-0.5], [y_loc+0.5, y_loc+0.5], color='green')
+        ax.fill_between([x_loc-0.5, x_loc+0.5], [y_loc-0.5, y_loc-0.5], [y_loc+0.5, y_loc+0.5], color=color)
 
   def is_pond_above(self, which_turtle=0):
     '''
@@ -1556,6 +1589,11 @@ class turtle_generator:
     # use this to track the current move of each turtle during the animation
     current_moves = [ 0 for k in range(self.number_of_turtles) ]
 
+    # note, we don't plot the maze, so we pass in None for the ax
+    maze = create_maze(None, self.nx, self.ny, self.maze_number, self.pond_location)
+    # grab goal location (collisions there are OK)
+    maze_goal = maze.maze_goal
+
     # loop over all moves
     for t in range( len(self.turtle_tape)):
       
@@ -1570,9 +1608,9 @@ class turtle_generator:
       for i in range(self.number_of_turtles):
         if (i != next_turtle):
           turtle_i_loc = current_location[i]
-          if turtle_i_loc == next_turtle_new_location:
+          if (turtle_i_loc == next_turtle_new_location) and (turtle_i_loc != maze_goal):
             print("Turtle " + str(i) + " and turtle " + str(next_turtle) + " are at the same location, " + \
-                  str(turtle_j_loc) + ", which happened after the " + str(t) + "-th move")
+                  str(turtle_i_loc) + ", which happens after move " + str(t) + "\n  (note we start counting moves at 0)" )
             return False
     
     return True
@@ -1611,7 +1649,10 @@ class turtle_generator:
 
     # Download turtle image for plotting, and then load that image into Python
     self.download_turtle_image()
-    image = OffsetImage(plt.imread('./turtle.png', format="png"), zoom=0.1)
+    
+    # Shrink turtle if more than one
+    zoom = self.turtle_scaling * (1.0 / (1.0 + (self.number_of_turtles-1)*0.2))
+    image = OffsetImage(plt.imread('./turtle.png', format="png"), zoom=zoom)
 
     # Use this to track the current move of each turtle during the animation
     current_moves = [ 0 for k in range(self.number_of_turtles) ]
@@ -1628,7 +1669,8 @@ class turtle_generator:
 
       for k in range(self.number_of_turtles):
         current_loc = self.turtles[k].movements[ current_moves[k] ]
-        ab = AnnotationBbox(image, current_loc, frameon=False)
+        plot_loc = ( current_loc[0] + self.plotting_offsets[k][0], current_loc[1] + self.plotting_offsets[k][1])
+        ab = AnnotationBbox(image, plot_loc, frameon=False)
         ax.add_artist(ab)
       
       for k in range(self.number_of_turtles):
