@@ -724,7 +724,7 @@ class turtle_generator:
       self.maze_number = maze_number
     else:
       self.maze_number = False
-      print("Invalid maze_number, should be either False (for no maze), or a supported maze number.  Currently, we support three mazes, maze_number = 1 or 2 or 3. Using default value False instead.")
+      print("Invalid maze_number, should be either False (for no maze), or a supported maze number.\nCurrently, we support three mazes, maze_number = 1 or 2 or 3. Using default value False instead.")
 
     # Set pond_location: check that value is either False (for no pond) or a valid pond location
     if (pond_location == False) or self.is_location_on_grid(pond_location):
@@ -735,11 +735,17 @@ class turtle_generator:
 
     # Set up plotting environment for animation
     import matplotlib.pyplot as plt
-    plt.rcParams['figure.dpi'] = 80
+    try:
+      # if in a notebook, do inline
+      get_ipython().run_line_magic('matplotlib', 'inline')
+    except:
+      pass
+    plt.rcParams['figure.dpi'] = 72
     plt.rcParams["animation.html"] = "jshtml" # javascript html writer
     plt.ioff() # Turn interactive mode off
     plt.rcParams["figure.figsize"] = [7, 7]
-    plt.rcParams["figure.autolayout"] = True
+    #plt.rcParams["figure.autolayout"] = True
+    #plt.rcParams["figure.constrained_layout.use"] = True
 
   def is_location_on_grid(self, location):
       '''
@@ -834,7 +840,7 @@ class turtle_generator:
             " thus this operation cannot be completed.")
 
     try:
-      self.turtles[which_turtle].move_left()
+      self.turtles[which_turtle].move_left(leave_trail=leave_trail)
       new_location = self.turtles[which_turtle].current_location()
       if not self.is_location_on_grid(new_location):
         self.turtles[which_turtle].undo_last_move()
@@ -869,7 +875,7 @@ class turtle_generator:
             " thus this operation cannot be completed.")
 
     try:
-      self.turtles[which_turtle].move_right()
+      self.turtles[which_turtle].move_right(leave_trail=leave_trail)
       new_location = self.turtles[which_turtle].current_location()
       if not self.is_location_on_grid(new_location):
         self.turtles[which_turtle].undo_last_move()
@@ -904,7 +910,7 @@ class turtle_generator:
             " thus this operation cannot be completed.")
 
     try:
-      self.turtles[which_turtle].move_up()
+      self.turtles[which_turtle].move_up(leave_trail=leave_trail)
       new_location = self.turtles[which_turtle].current_location()
       if not self.is_location_on_grid(new_location):
         self.turtles[which_turtle].undo_last_move()
@@ -939,7 +945,7 @@ class turtle_generator:
             " thus this operation cannot be completed.")
 
     try:
-      self.turtles[which_turtle].move_down()
+      self.turtles[which_turtle].move_down(leave_trail=leave_trail)
       new_location = self.turtles[which_turtle].current_location()
       if not self.is_location_on_grid(new_location):
         self.turtles[which_turtle].undo_last_move()
@@ -1007,7 +1013,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1041,7 +1047,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1077,7 +1083,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1107,7 +1113,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1154,7 +1160,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1170,9 +1176,9 @@ class turtle_generator:
         if len(movements) == maze.get_shortest_path_length():
           return True
         else:
-          print("Did not use shortest path.  Your path was length " + str(len(self.movements)) + ". The shortest path was " + str(maze.get_shortest_path_length()))
+          print("Did not use shortest path.  Your path was length " + str(len(movements)) + ". The shortest path was " + str(maze.get_shortest_path_length()))
       else:
-        print("Starting position was incorrect.  Should use (0,0), you instead used " + str(self.movements[0]) )
+        print("Starting position was incorrect.  Should use (0,0), you instead used " + str(movements[0]) )
     
     return False
 
@@ -1199,13 +1205,13 @@ class turtle_generator:
       return None
     
     # retrieve this turtle's list of movements
-    movements, trail = self.turtles[which_turtle].get_movements_and_trail()
+    movements, leave_trail = self.turtles[which_turtle].get_movements_and_trail()
 
     if t > len(movements) or t > len(leave_trail):
       print("You have requested too many movements to plot a trail for.  You only have " + str(len(movements)) + " stored movements")
 
     for i in range(t):
-      if self.leave_trail[i]:
+      if leave_trail[i]:
         move = movements[i]
         x_loc = move[0]
         y_loc = move[1]
@@ -1227,7 +1233,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1260,7 +1266,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1293,7 +1299,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1326,7 +1332,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1360,7 +1366,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1404,7 +1410,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1448,7 +1454,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1492,7 +1498,7 @@ class turtle_generator:
     '''
     
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
     
@@ -1517,6 +1523,59 @@ class turtle_generator:
         return True
     
     return False
+
+  
+  def do_turtles_collide(self):
+    '''
+    Check if any of the turtles collide, that is, occupy the same square at the
+    same time.  The one exception, is that the turtles are allowed to all start
+    on the same square
+
+    Parameters
+    --------
+    None
+
+    Returns
+    --------
+    True or False (technically called a Boolean)
+      True is returned if no turtles ever collide (occupy the same square at the same time)
+      False is returned if two turtles collide, at some point
+
+    '''
+
+    # Check that some turtles have been initialized
+    if (self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+      return
+
+    # Strategy: Replay all the turtle moves, checking to see if two turtles are ever in the same location
+
+    # use this to track the current location of each turtle during the animation
+    current_location = [ self.turtles[k].movements[0] for k in range(self.number_of_turtles) ]
+
+    # use this to track the current move of each turtle during the animation
+    current_moves = [ 0 for k in range(self.number_of_turtles) ]
+
+    # loop over all moves
+    for t in range( len(self.turtle_tape)):
+      
+      # decide which turtle is moving next, and increment it's move counter
+      next_turtle = self.turtle_tape[t]
+      current_moves[next_turtle] = current_moves[next_turtle] + 1
+      # get new location for this turtle
+      next_turtle_new_location = self.turtles[next_turtle].movements[ current_moves[next_turtle] ]
+      current_location[next_turtle] = next_turtle_new_location
+      
+      # check that no turtle is at the same location
+      for i in range(self.number_of_turtles):
+        if (i != next_turtle):
+          turtle_i_loc = current_location[i]
+          if turtle_i_loc == next_turtle_new_location:
+            print("Turtle " + str(i) + " and turtle " + str(next_turtle) + " are at the same location, " + \
+                  str(turtle_j_loc) + ", which happened after the " + str(t) + "-th move")
+            return False
+    
+    return True
 
   def watch_me_move(self):
     '''
@@ -1543,7 +1602,7 @@ class turtle_generator:
     import matplotlib.animation
 
     # Check that some turtles have been initialized
-    if ((self.turtles == []) or (self.turtles == None):
+    if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
 
@@ -1564,6 +1623,7 @@ class turtle_generator:
       # decide which turtle is moving next (skip t == 0, as we want to plot the starting position)
       if t > 0:
         next_turtle = self.turtle_tape[t-1]
+        # increment this turtle's move counter
         current_moves[next_turtle] = current_moves[next_turtle] + 1
 
       for k in range(self.number_of_turtles):
@@ -1573,7 +1633,7 @@ class turtle_generator:
       
       for k in range(self.number_of_turtles):
         # plot trail up to and including the last move by this turtle
-        self.plot_trail(ax, current_moves[k]+1, which_turtle)
+        self.plot_trail(ax, current_moves[k]+1, which_turtle=k)
 
       # Create maze and draw it
       maze = create_maze(ax, self.nx, self.ny, self.maze_number, self.pond_location)
