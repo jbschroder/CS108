@@ -1653,6 +1653,8 @@ class turtle_generator:
     # Shrink turtle if more than one
     zoom = self.turtle_scaling * (1.0 / (1.0 + (self.number_of_turtles-1)*0.2))
     image = OffsetImage(plt.imread('./turtle.png', format="png"), zoom=zoom)
+    image_left = OffsetImage(plt.imread('./turtle_left.png', format="png"), zoom=zoom)
+    image_right = OffsetImage(plt.imread('./turtle_right.png', format="png"), zoom=zoom)
 
     # Use this to track the current move of each turtle during the animation
     current_moves = [ 0 for k in range(self.number_of_turtles) ]
@@ -1663,15 +1665,37 @@ class turtle_generator:
       
       # decide which turtle is moving next (skip t == 0, as we want to plot the starting position)
       if t > 0:
-        next_turtle = self.turtle_tape[t-1]
-        # increment this turtle's move counter
-        current_moves[next_turtle] = current_moves[next_turtle] + 1
-
+        # note we use (t-1) because we animate the first frame differently
+        next_turtle = self.turtle_tape[int((t-1)/3)]
+        if ((t-1)%3) == 0:
+          # increment this turtle's move counter
+          current_moves[next_turtle] = current_moves[next_turtle] + 1
+      else:
+        next_turtle = -1 # do nothing for initial frame
+      
+      # Plot each individual turtle
       for k in range(self.number_of_turtles):
-        current_loc = self.turtles[k].movements[ current_moves[k] ]
-        plot_loc = ( current_loc[0] + self.plotting_offsets[k][0], current_loc[1] + self.plotting_offsets[k][1])
-        ab = AnnotationBbox(image, plot_loc, frameon=False)
-        ax.add_artist(ab)
+        if k == next_turtle:
+          # We plot intermediate frames for the turtle moving
+          old_loc = self.turtles[k].movements[ current_moves[k]-1 ]
+          current_loc = self.turtles[k].movements[ current_moves[k] ]
+          scale = (((t-1)%3)+1)/3.0
+          interp_loc = ((1-scale)*old_loc[0] + scale*current_loc[0], (1-scale)*old_loc[1] + scale*current_loc[1])
+          plot_loc = ( interp_loc[0] + self.plotting_offsets[k][0], interp_loc[1] + self.plotting_offsets[k][1])
+          if (t%3) == 0:
+            ab = AnnotationBbox(image, plot_loc, frameon=False)
+          elif (t%3) == 1:
+            ab = AnnotationBbox(image_left, plot_loc, frameon=False)
+          elif (t%3) == 2:
+            ab = AnnotationBbox(image_right, plot_loc, frameon=False)
+          ax.add_artist(ab)
+
+        else:
+          # Normal turtle plot
+          current_loc = self.turtles[k].movements[ current_moves[k] ]
+          plot_loc = ( current_loc[0] + self.plotting_offsets[k][0], current_loc[1] + self.plotting_offsets[k][1])
+          ab = AnnotationBbox(image, plot_loc, frameon=False)
+          ax.add_artist(ab)
       
       for k in range(self.number_of_turtles):
         # plot trail up to and including the last move by this turtle
@@ -1688,7 +1712,7 @@ class turtle_generator:
     #ax.axis('equal')
 
     # Note that we plot one extra frame len(self.turtle_tape)+1, so that we can show the starting position
-    anim = matplotlib.animation.FuncAnimation(fig, animate, frames=len(self.turtle_tape)+1, interval=400, repeat=False)
+    anim = matplotlib.animation.FuncAnimation(fig, animate, frames=3*len(self.turtle_tape)+1, interval=140, repeat=False)
 
     return anim
 
