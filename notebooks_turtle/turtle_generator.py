@@ -1018,6 +1018,8 @@ class turtle_generator:
     plt.xticks(range(self.nx), fontsize=15)
     plt.yticks(range(self.ny), fontsize=15)
 
+    plt.ioff() # Turn interactive mode off
+
 
   def check_stayed_on_maze_path(self, which_turtle=0):
     '''
