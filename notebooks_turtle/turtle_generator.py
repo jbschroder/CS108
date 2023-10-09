@@ -811,10 +811,13 @@ class turtle_generator:
     import os
     from urllib.request import urlretrieve
     (file1, message1) = urlretrieve('https://raw.githubusercontent.com/jbschroder/CS108/main/notebooks_turtle/turtle.png', 'turtle.png')
-
-    OK = os.path.isfile('./turtle.png')
-    if(OK == False):
-      print("Something went wrong with downloading turtle image")
+    (file2, message2) = urlretrieve('https://raw.githubusercontent.com/jbschroder/CS108/main/notebooks_turtle/turtle_left.png', 'turtle_left.png')
+    (file3, message3) = urlretrieve('https://raw.githubusercontent.com/jbschroder/CS108/main/notebooks_turtle/turtle_right.png', 'turtle_right.png')
+ 
+    for fname in ['./turtle.png', './turtle_left.png', './turtle_right.png']:
+      OK = os.path.isfile(fname)
+      if(OK == False):
+        print("Something went wrong with downloading turtle image " + fname)
 
   def start_new_journey(self):
     '''
