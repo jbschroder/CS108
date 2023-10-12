@@ -1651,9 +1651,16 @@ class turtle_generator:
     filehandler.close()
     '''
     import pickle
+    from datetime import datetime
+    
     filehandler = open('turtle.pickle', 'wb')
     pickle.dump(self, filehandler)
     filehandler.close()
+
+    now = datetime.now()
+    # dd/mm/YY H:M:S
+    dt_string = now.strftime("%H:%M:%S on %d/%m/%Y")
+    print("\nYou just saved your turtle to file at " + dt_string + "\nThank you!\n")
 
   def watch_me_move(self):
     '''
