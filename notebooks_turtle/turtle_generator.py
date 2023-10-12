@@ -1620,6 +1620,41 @@ class turtle_generator:
     
     return True
 
+  def save_everything_to_file(self):
+    '''
+    Save a history of everything that you've done with this turtle object.
+    The saved file will primarily be used for grading
+
+    Parameters
+    --------
+    None
+
+    Returns
+    --------
+    Save a history of everything that you've done with this turtle object
+    to the file turtle.pickle
+
+    Pickling just preserves something permanently to a file (just like pickling
+    a cucumber!)
+
+    Example
+    -------
+    turtle.save_everything_to_file()a
+
+    Notes
+    -----
+    To load a saved turtle, do the following
+
+    import pickle
+    filehandler = open('turtle.pickle', 'rb')
+    turtle = pickle.load(filehandler)
+    filehandler.close()
+    '''
+    import pickle
+    filehandler = open('turtle.pickle', 'wb')
+    pickle.dump(self, filehandler)
+    filehandler.close()
+
   def watch_me_move(self):
     '''
     Finalize and create animation
