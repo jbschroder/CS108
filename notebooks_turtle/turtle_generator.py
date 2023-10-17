@@ -746,6 +746,7 @@ class turtle_generator:
       self.start_location = (0,0)
       print("Invalid start location given. start should be coordinates inside the grid like (0,0) or (2,2). Using default value (0,0) instead.")
 
+    # Cannot set maze_number and pond_location at the same time.  
     if (maze_number != False) and (pond_location != False):
       print("Cannot set both pond_location and maze_number.  The maze_number determines the pond_location automatically, as the maze's goal. Ignoring user pond_location and using the maze_number's goal location for the pond.")
 
@@ -1631,7 +1632,7 @@ class turtle_generator:
 
     # note, we don't plot the maze, so we pass in None for the ax
     layout = create_layout(None, self.nx, self.ny, self.maze_number, self.pond_location)
-    # grab goal location (collisions there are OK)
+    # grab maze goal location because collisions there are OK (note pond location is the maze_goal)
     maze_goal = layout.pond_location
 
     # loop over all moves
