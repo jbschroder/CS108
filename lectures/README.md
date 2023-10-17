@@ -1,5 +1,6 @@
 ## How to use notebooks for lectures / slides
 1. Install RISE extension for jupyter notebook `pip install RISE`
+   `jupyter nbextension enable rise --py --sys-prefix`
 2. Open Jupyter Notebook
 3. Open slide deck (.ipynb for lecture)
 4. Clear all output
