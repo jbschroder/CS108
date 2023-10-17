@@ -210,14 +210,13 @@ class create_layout:
         elif border == 'r':
           self.draw_line( (x_loc+0.5, y_loc-0.5), (x_loc+0.5, y_loc+0.5), 'dark')
 
-  def draw_pond(self, ax):
+  def draw_pond(self):
     '''
     Draw pond at location specified by user 
 
     Parameters
     ----------
-    ax : graphical/plotting axes, generated with
-        fig, ax = plt.subplots()
+    None
 
     Returns
     -------
@@ -231,7 +230,7 @@ class create_layout:
     x = np.linspace(pond_x-1, pond_x+1, 100)
     y1 = np.sqrt(1 - (x - pond_x)**2) + pond_y
     y2 = -np.sqrt(1 - (x - pond_x)**2) + pond_y
-    ax.fill_between(x, y1, y2, color=(0.1176, 0.5647, 1.0) )
+    self.ax.fill_between(x, y1, y2, color=(0.1176, 0.5647, 1.0) )
 
   def draw(self):
     '''
@@ -763,6 +762,7 @@ class turtle_generator:
       layout = create_layout(None, self.nx, self.ny, self.maze_number)
       pond_location = layout.pond_location
     else:
+      self.maze_number = False
       # Set pond_location if the user specified one 
       if (pond_location == False) or self.is_location_on_grid(pond_location):
         self.pond_location = pond_location
