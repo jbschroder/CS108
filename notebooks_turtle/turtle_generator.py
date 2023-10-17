@@ -1,21 +1,22 @@
-"""Define turtle object and helper object that defines mazes"""
+"""Define turtle object and helper object that defines the layout, including possible maze and pond"""
 
 
-class create_maze:
+class create_layout:
 
   nx = None            # Number of squares in the grid horizontally 
   ny = None            # Number of squares in the grid vertically
-  ax = None            # plotting axes for maze
+  ax = None            # plotting axes for layout
   maze_number = None   # True or False, controlling whether the maze is plotted
   maze_path = []       # path defining the maze
-  maze_goal = None     # Location (x,y) of the maze goal, where the turtle wants to goal
+  pond_location = None # Location (x,y) of the pond (if maze_number is used, then the maze determines pond location)
+                       #   --> The pond_location is the maze goal
   shortest_path_length = None # Length of shortest path from (0,0) to maze goal, while staying inside maze
   
-  def __init__(self, ax, nx, ny, maze_number=False):
+  def __init__(self, ax, nx, ny, maze_number=False, pond_location=False):
     '''
-    Creates a maze for plotting, technically we could call this a maze object.
-    To use, you'll have to first create the maze, and then give the command to 
-    draw the maze,
+    Creates a layout for plotting, including possible maze and pond options. 
+    Technically we could call this the layout object. To use, you'll have to 
+    first create the layout, and then give the command to draw the layout.
 
     Parameters
     ----------
@@ -33,9 +34,19 @@ class create_maze:
       If False, no maze is plotted.  If a number, then the maze corresponding to
       that number is plotted.
 
+    pond_location : If pond_location is False, then no pond is plotted.
+      If pond_location is a pair of numbers (technially called a tuple), then
+      this defines the pond location on the grid, like (12, 12) or (5,6).
+      This location should be on the grid, and not outside the grid.
+    
+      The pond_location does not work with maze_number.  If you choose a maze,
+      then the maze chooses the pond_location automatically.
+
+      The pond_location is the "goal" of the layout
+
     Returns
     -------
-    A new maze for plotting (technicall, we call this a maze object)
+    A new layout for plotting (technically, we call this a layoutobject)
 
     Example
     -------
@@ -44,21 +55,35 @@ class create_maze:
     nx = 14
     ny = 14
     maze_number = 1
-    maze = create_maze(ax, nx, ny, maze_number)
-    maze.draw()
+    layout = create_layout(ax, nx, ny, maze_number)
+    layout.draw()
 
     '''
+
+    if (maze_number != False) and (pond_location != False):
+      print("Cannot set both pond_location and maze_number.  The maze_number determines the pond_location automatically, as the maze's goal. Ignoring user pond_location and using the maze_number's goal location for the pond.")
+
     self.ax = ax
     self.nx = nx
     self.ny = ny
     self.maze_number = maze_number
     self.maze_path = []
+    # self.pond_location set below while processing maze_number
 
     if (self.maze_number != False):
+      # Process user's maze_number value (which also sets the pond location)
       if (self.maze_number == 1):
-        self.maze_path, self.maze_goal, self.shortest_path_length = self.generate_maze1()
+        self.maze_path, self.pond_location, self.shortest_path_length = self.generate_maze1()
       else:
         raise ValueError("Invalid Maze Number")
+    else:
+      # No maze specified, so process user's pond_location
+      if (pond_location == False) or self.is_location_on_grid(pond_location):
+        self.pond_location = pond_location
+      else:
+        self.pond_location = False
+        print("Invalid pond_location value, should be either False (for no pond), or coordinates inside the grid like (0,0) or (2,2). Using default value False instead.")
+
 
   def is_location_on_grid(self, location):
       '''
@@ -77,8 +102,8 @@ class create_maze:
       False if the location is outside the grid
       '''
       
-      # Note, that we accept points from -0.5 to nx-0.5, because we draw the maze 
-      # from -0.5 to nx-0.5.  The same is true for the y-axis.
+      # Note, that we accept points from -0.5 to nx-0.5, because we draw the 
+      # layout and maze from -0.5 to nx-0.5.  The same is true for the y-axis.
       if (type(location) == tuple)  and (len(location) == 2)       and \
          (location[0]%0.5 == 0)     and (location[1]%0.5 == 0) and \
          (location[0] >= -0.5)      and (location[0] <= self.nx-0.5)    and \
@@ -156,7 +181,7 @@ class create_maze:
 
   def draw_maze(self):
     '''
-    Draw maze corresponding to the maze number given when the maze was created. 
+    Draw maze corresponding to the maze number given when the layout was created. 
     Maze is stored internally at self.maze_path.  See generate_maze1 for 
     description of how the maze is stored.
 
@@ -174,7 +199,7 @@ class create_maze:
       x_loc = point[0]
       y_loc = point[1]
       
-      # Draw a borth on the top, bottom, left, or right (t, b, l, r)
+      # Draw a border on the top, bottom, left, or right (t, b, l, r)
       for border in borders:
         if border == 't':
           self.draw_line( (x_loc-0.5, y_loc+0.5), (x_loc+0.5, y_loc+0.5), 'dark')
@@ -187,7 +212,7 @@ class create_maze:
 
   def draw_pond(self):
     '''
-    Draw pond at location of maze goal
+    Draw pond at location specified by user 
 
     Parameters
     ----------
@@ -198,10 +223,10 @@ class create_maze:
     The plot corresponding to self.ax has the pond plotted on it
 
     '''
-    # Draw pond centered at self.maze_goal with radius 1
+    # Draw pond centered at self.pond_location with radius 1
     import numpy as np
-    pond_x = self.maze_goal[0]
-    pond_y = self.maze_goal[1]
+    pond_x = self.pond_location[0]
+    pond_y = self.pond_location[1]
     x = np.linspace(pond_x-1, pond_x+1, 100)
     y1 = np.sqrt(1 - (x - pond_x)**2) + pond_y
     y2 = -np.sqrt(1 - (x - pond_x)**2) + pond_y
@@ -210,8 +235,8 @@ class create_maze:
   def draw(self):
     '''
     Draw the maze
-    Note the maze drawn is the one specified when you first created this maze
-    with create_maze(...)
+    Note the maze drawn is the one specified when you first created this layout
+    with create_layout(...)
 
     Parameters
     ----------
@@ -223,8 +248,10 @@ class create_maze:
 
     '''
     self.draw_grid()
-    if self.maze_number != False:
+    if (self.pond_location) != False and (self.pond_location != None):
       self.draw_pond()
+
+    if self.maze_number != False:
       self.draw_maze()
 
   def get_shortest_path_length(self):
@@ -243,7 +270,8 @@ class create_maze:
     
   def check_path_stays_on_maze(self, movements):
     '''
-    Return True or False (technically called a Boolean vlaue), whether or not the list of movements stays inside the maze
+    Return True or False (technically called a Boolean vlaue), whether or not the 
+    list of movements stays inside the maze
       
     Parameters
     ----------
@@ -284,7 +312,7 @@ class create_maze:
     '''
 
     for move in movements:
-      if move == self.maze_goal:
+      if move == self.pond_location:
         return True
         
     return False
@@ -648,8 +676,8 @@ class turtle_generator:
   def __init__(self, nx=14, ny=14, start_location=(0,0), maze_number=False,
                pond_location=False, number_of_turtles=1):
     '''
-    Creates a turtle object, can use other function to move it on the grid and
-    plot the background grid and maze for the turtle to explore
+    Creates a turtle object, can use other functions to move it on the grid and
+    plot the layout (background grid, pond, and maze) for the turtle to explore
 
     Parameters
     ----------
@@ -718,25 +746,29 @@ class turtle_generator:
       self.start_location = (0,0)
       print("Invalid start location given. start should be coordinates inside the grid like (0,0) or (2,2). Using default value (0,0) instead.")
 
-    # Set maze_number: check that value is either False (for no maze) or a value maze number
-    if (maze_number == False) or (maze_number == 1) or (maze_number == 2) or (maze_number == 3):
-      self.maze_number = maze_number
-      
-      if (maze_number == 1) or (maze_number == 2) or (maze_number == 3):
-        # Set the pond_location as the maze_goal
-        maze = create_maze(None, self.nx, self.ny, self.maze_number)
-        pond_location = maze.maze_goal
+    if (maze_number != False) and (pond_location != False):
+      print("Cannot set both pond_location and maze_number.  The maze_number determines the pond_location automatically, as the maze's goal. Ignoring user pond_location and using the maze_number's goal location for the pond.")
 
-    else:
+    # Set maze_number: first check that value is either False (for no maze) or a value maze number
+    if (maze_number != False) and (maze_number != 1) and (maze_number != 2) and (maze_number != 3):
       self.maze_number = False
       print("Invalid maze_number, should be either False (for no maze), or a supported maze number.\nCurrently, we support three mazes, maze_number = 1 or 2 or 3. Using default value False instead.")
-
-    # Set pond_location: check that value is either False (for no pond) or a valid pond location
-    if (pond_location == False) or self.is_location_on_grid(pond_location):
-      self.pond_location = pond_location
+    
+    # If valid maze_number chosen, process this maze choice
+    if (maze_number == 1) or (maze_number == 2) or (maze_number == 3):
+      self.maze_number = maze_number
+      
+      # Set the pond_location as the layout's pond_location (i.e., maze goal)
+      layout = create_layout(None, self.nx, self.ny, self.maze_number)
+      pond_location = layout.pond_location
     else:
-      self.pond_location = False
-      print("Invalid pond_location value, should be either False (for no pond), or coordinates inside the grid like (0,0) or (2,2). Using default value False instead.")
+      self.maze_number = False
+      # Set pond_location if the user specified one 
+      if (pond_location == False) or self.is_location_on_grid(pond_location):
+        self.pond_location = pond_location
+      else:
+        self.pond_location = False
+        print("Invalid pond_location value, should be either False (for no pond), or coordinates inside the grid like (0,0) or (2,2). Using default value False instead.")
 
     # Set plotting offsets for multiple turtles
     if self.number_of_turtles == 1:
@@ -980,29 +1012,6 @@ class turtle_generator:
     except:
       raise ValueError("You need to call start_new_journey first")
 
-  def draw_pond(self, ax):
-    '''
-    Draw pond at location specified by user 
-
-    Parameters
-    ----------
-    ax : graphical/plotting axes, generated with
-        fig, ax = plt.subplots()
-
-    Returns
-    -------
-    The plot corresponding to self.ax has the pond plotted on it
-
-    '''
-    # Draw pond centered at self.pond_location with radius 1
-    import numpy as np
-    pond_x = self.pond_location[0]
-    pond_y = self.pond_location[1]
-    x = np.linspace(pond_x-1, pond_x+1, 100)
-    y1 = np.sqrt(1 - (x - pond_x)**2) + pond_y
-    y2 = -np.sqrt(1 - (x - pond_x)**2) + pond_y
-    ax.fill_between(x, y1, y2, color=(0.1176, 0.5647, 1.0) )
-
   def show_starting_position(self):
     '''
     Plot the turtle on the starting grid, no animation, just show how everything starts
@@ -1036,13 +1045,9 @@ class turtle_generator:
       ab = AnnotationBbox(image, plot_location , frameon=False)
       ax.add_artist(ab)
 
-    # Create maze and draw it
-    if (self.maze_number != False) and (self.maze_number != None):
-      maze = create_maze(ax, self.nx, self.ny, self.maze_number)
-      maze.draw()
-    elif (self.pond_location != False) and (self.pond_location != None):
-      # If there's no maze, and we have a user specified pond, then draw the pond
-      self.draw_pond(ax)
+    # Create layout and draw it
+    layout = create_layout(ax, self.nx, self.ny, self.maze_number, self.pond_location)
+    layout.draw()
 
     # Add axes ticks
     plt.xticks(range(self.nx), fontsize=15)
@@ -1080,10 +1085,10 @@ class turtle_generator:
       return None
     
     # Note, we don't plot the maze, so we pass in None for the ax
-    maze = create_maze(None, self.nx, self.ny, self.maze_number)
+    layout = create_layout(None, self.nx, self.ny, self.maze_number, self.pond_location)
     
     movements, trail = self.turtles[which_turtle].get_movements_and_trail()
-    return maze.check_path_stays_on_maze(movements)
+    return layout.check_path_stays_on_maze(movements)
     
   def check_reached_maze_goal(self, which_turtle=0):
     '''
@@ -1114,10 +1119,10 @@ class turtle_generator:
       return None
     
     # Note, we don't plot the maze, so we pass in None for the ax
-    maze = create_maze(None, self.nx, self.ny, self.maze_number)
+    layout = create_layout(None, self.nx, self.ny, self.maze_number, self.pond_location)
     
     movements, trail = self.turtles[which_turtle].get_movements_and_trail()
-    return maze.check_path_includes_goal(movements)  
+    return layout.check_path_includes_goal(movements)  
 
   def check_continuous_movements(self, which_turtle=0):
     '''
@@ -1232,11 +1237,11 @@ class turtle_generator:
         
         if movements[0] == (0,0):
           # Note, we don't plot the maze, so we pass in None for the ax
-          maze = create_maze(None, self.nx, self.ny, self.maze_number)
-          if len(movements) == maze.get_shortest_path_length():
+          layout = create_layout(None, self.nx, self.ny, self.maze_number, self.pond_location)
+          if len(movements) == layout.get_shortest_path_length():
             return True
           else:
-            print("Did not use shortest path.  Your path was length " + str(len(movements)) + ". The shortest path was " + str(maze.get_shortest_path_length()))
+            print("Did not use shortest path.  Your path was length " + str(len(movements)) + ". The shortest path was " + str(layout.get_shortest_path_length()))
         else:
           print("Starting position was incorrect.  Should use (0,0), you instead used " + str(movements[0]) )
       
@@ -1445,9 +1450,9 @@ class turtle_generator:
     # Get current location and current maze
     current_loc = self.turtles[which_turtle].current_location()
     # Note, we don't plot the maze, so we pass in None for the ax
-    maze = create_maze(None, self.nx, self.ny, self.maze_number)
+    layout = create_layout(None, self.nx, self.ny, self.maze_number, self.pond_location)
 
-    open_directions = maze.find_open_directions(current_loc)
+    open_directions = layout.find_open_directions(current_loc)
     
     if open_directions == False:
       print("Your turtle has left the maze path, so you can't ask questions about how to follow the maze path")
@@ -1489,9 +1494,9 @@ class turtle_generator:
     # Get current location and current maze
     current_loc = self.turtles[which_turtle].current_location()
     # Note, we don't plot the maze, so we pass in None for the ax
-    maze = create_maze(None, self.nx, self.ny, self.maze_number)
+    layout = create_layout(None, self.nx, self.ny, self.maze_number, self.pond_location)
 
-    open_directions = maze.find_open_directions(current_loc)
+    open_directions = layout.find_open_directions(current_loc)
     
     if open_directions == False:
       print("Your turtle has left the maze path, so you can't ask questions about how to follow the maze path")
@@ -1533,9 +1538,9 @@ class turtle_generator:
     # Get current location and current maze
     current_loc = self.turtles[which_turtle].current_location()
     # Note, we don't plot the maze, so we pass in None for the ax
-    maze = create_maze(None, self.nx, self.ny, self.maze_number)
+    layout = create_layout(None, self.nx, self.ny, self.maze_number, self.pond_location)
 
-    open_directions = maze.find_open_directions(current_loc)
+    open_directions = layout.find_open_directions(current_loc)
     
     if open_directions == False:
       print("Your turtle has left the maze path, so you can't ask questions about how to follow the maze path")
@@ -1577,9 +1582,9 @@ class turtle_generator:
     # Get current location and current maze
     current_loc = self.turtles[which_turtle].current_location()
     # Note, we don't plot the maze, so we pass in None for the ax
-    maze = create_maze(None, self.nx, self.ny, self.maze_number)
+    layout = create_layout(None, self.nx, self.ny, self.maze_number, self.pond_location)
 
-    open_directions = maze.find_open_directions(current_loc)
+    open_directions = layout.find_open_directions(current_loc)
     
     if open_directions == False:
       print("Your turtle has left the maze path, so you can't ask questions about how to follow the maze path")
@@ -1625,9 +1630,9 @@ class turtle_generator:
     current_moves = [ 0 for k in range(self.number_of_turtles) ]
 
     # note, we don't plot the maze, so we pass in None for the ax
-    maze = create_maze(None, self.nx, self.ny, self.maze_number)
+    layout = create_layout(None, self.nx, self.ny, self.maze_number, self.pond_location)
     # grab goal location (collisions there are OK)
-    maze_goal = maze.maze_goal
+    maze_goal = layout.pond_location
 
     # loop over all moves
     for t in range( len(self.turtle_tape)):
@@ -1778,13 +1783,9 @@ class turtle_generator:
         # plot trail up to and including the last move by this turtle
         self.plot_trail(ax, current_moves[k]+1, which_turtle=k)
 
-      # Create maze and draw it
-      if (self.maze_number != False) and (self.maze_number != None):
-        maze = create_maze(ax, self.nx, self.ny, self.maze_number)
-        maze.draw()
-      elif (self.pond_location != False) and (self.pond_location != None):
-        # If there's no maze, and we have a user specified pond, then draw the pond
-        self.draw_pond(ax)
+      # Create layout and draw it
+      layout = create_layout(ax, self.nx, self.ny, self.maze_number, self.pond_location)
+      layout.draw()
 
       # Add axes ticks
       plt.xticks(range(self.nx), fontsize=15)
