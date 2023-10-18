@@ -71,6 +71,10 @@ class create_layout:
       # Process user's maze_number value (which also sets the pond location)
       if (self.maze_number == 1):
         self.maze_path, self.pond_location, self.shortest_path_length = self.generate_maze1()
+      elif (self.maze_number == 2):
+        self.maze_path, self.pond_location, self.shortest_path_length = self.generate_maze2()
+      elif (self.maze_number == 3):
+        self.maze_path, self.pond_location, self.shortest_path_length = self.generate_maze3()
       else:
         raise ValueError("Invalid Maze Number")
     else:
@@ -408,8 +412,205 @@ class create_layout:
 
     return path, maze_goal, shortest_path_length
 
-  # insert maze 2, 3, 4, and so on...
+  def generate_maze2(self):
+    '''
+    Generate Maze 2 using a stored design.  This maze contains 1 level of branching to include
+    dead-ends and two different paths to the goal 
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    Three values are returned
+      First:  maze_path defining maze 2 (list type, see Notes for details on how the maze is represented)
+      Second: maze_goal location (x,y), that is, where the turtle wants to go
+      Third:  shortest_path_length, that is, the length of the shortest maze path from (0,0) to the maze_goal
+    
+    Notes
+    -----
+    The maze_path is stored as list, with each list element defining one block of the maze
+    For example, if maze_path[k] = ( (3,4), ('l', 'r') ),
+       then this maze part is at point (3,4), with a border to the left and to the right
+       And, if maze_path[k] = ( (6,2), ('t', 'b') ),
+       then this maze part is at point (6,2), with a border on the top and on the bottom
+    Any mixture of 'l', 'r', 't', 'b' is supported for each maze part.
+    '''
+    
+    path = []
+    path.append( ((0,0), ('t', 'b','l')) )
+    path.append( ((1,0), ('t', 'b')) )
+    path.append( ((2,0), ('t', 'b')) )
+    path.append( ((3,0), ('t', 'b')) )
+    path.append( ((4,0), ('t', 'b')) )
+    path.append( ((5,0), ('b', 'r')) )
+    
+    path.append( ((5,1), ('l', 'r')) )
+    path.append( ((5,2), ('l', 'r')) )
+    path.append( ((5,3), ('l', 'r')) )
+    path.append( ((5,4), ('l', 'r')) )
+    path.append( ((5,5), (     'r')) )
+    path.append( ((5,6), ('l', 't')) )
+
+    # define branch 1
+    path.append( ((4,5), ('t', 'b')) )
+    path.append( ((3,5), ('t', 'b')) )
+    path.append( ((2,5), ('b', 'l')) )
+    path.append( ((2,6), ('l', 'r')) )
+    path.append( ((2,7), ('l', 'r')) )
+    path.append( ((2,8), ('l', 'r', 't')) )
+
+    # define branch 2
+    path.append( ((6,6),  ('t', 'b')) )
+    path.append( ((7,6),  ('r'     )) )
+    path.append( ((7,5),  ('l', 'b')) )
+
+    path.append( ((8,5),  ('t', 'b')) )
+    path.append( ((9,5),  ('t', 'b')) )
+    path.append( ((10,5), ('t', 'b')) )
+    path.append( ((11,5), ('t', 'b')) )
+    path.append( ((12,5), ('b', 'r')) )
+
+    path.append( ((12,6),  ('l', 'r')) )
+    path.append( ((12,7),  ('l', 'r')) )
+    path.append( ((12,8),  ('l', 'r')) )
+    path.append( ((12,9),  ('l', 'r')) )
+    path.append( ((12,10), ('l', 'r')) )
+    path.append( ((12,11), ('l', 'r')) )
+    path.append( ((12,12), ('r', 't')) ) 
+
+    # define branch 3
+    path.append( ((7,7),  ('l', 'r')) )
+    path.append( ((7,8),  ('l', 'r')) )
+    path.append( ((7,9),  ('l', 'r')) )
+    path.append( ((7,10), ('l', 'r')) )
+    path.append( ((7,11), ('l', 'r')) )
+    path.append( ((7,12), ('l', 't')) )
+
+    path.append( ((8,12),  ('t', 'b')) )
+    path.append( ((9,12),  ('t', 'b')) )
+    path.append( ((10,12), ('t', 'b')) )
+    path.append( ((11,12), ('t', 'b')) )
+    path.append( ((12,12), ('t')) )
+
+
+    maze_goal = (12,12) 
+    shortest_path_length = 25
+
+    return path, maze_goal, shortest_path_length
   
+  def generate_maze3(self):
+    '''
+    Generate Maze 3 using a stored design.  This maze contains 2 levels of branching to include
+    more dead-ends and multiple paths to the goal 
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    Three values are returned
+      First:  maze_path defining maze 3 (list type, see Notes for details on how the maze is represented)
+      Second: maze_goal location (x,y), that is, where the turtle wants to go
+      Third:  shortest_path_length, that is, the length of the shortest maze path from (0,0) to the maze_goal
+    
+    Notes
+    -----
+    The maze_path is stored as list, with each list element defining one block of the maze
+    For example, if maze_path[k] = ( (3,4), ('l', 'r') ),
+       then this maze part is at point (3,4), with a border to the left and to the right
+       And, if maze_path[k] = ( (6,2), ('t', 'b') ),
+       then this maze part is at point (6,2), with a border on the top and on the bottom
+    Any mixture of 'l', 'r', 't', 'b' is supported for each maze part.
+    '''
+    
+    path = []
+    path.append( ((0,0), ('t', 'b','l')) )
+    path.append( ((1,0), ('t', 'b')) )
+    path.append( ((2,0), ('t', 'b')) )
+    path.append( ((3,0), ('t', 'b')) )
+    path.append( ((4,0), ('t', 'b')) )
+    path.append( ((5,0), ('t', 'b')) )
+    path.append( ((6,0), ('b', 'r')) )
+    
+    path.append( ((6,1), ('l', 'r')) )
+    path.append( ((6,2), ('l', 'r')) )
+    path.append( ((6,3), ('t'     )) )
+
+    # level 1 -- branch to left
+    path.append( ((5,3), ('t', 'b')) )
+    path.append( ((4,3), ('b', 'l')) )
+    path.append( ((4,4), ('l', 'r')) )
+    path.append( ((4,5), (     'r')) )
+    # level 2 -- branch to left
+    path.append( ((3,5), ('t', 'b')) )
+    path.append( ((2,5), ('l', 'b')) )
+    path.append( ((2,6), ('l', 'r')) )
+    path.append( ((2,7), ('l', 'r')) )
+    path.append( ((2,8), ('t', 'r')) )
+    path.append( ((1,8), ('t', 'b')) )
+    path.append( ((0,8), ('t', 'b', 'l')) )
+    # level 2 -- keep going up 
+    path.append( ((4,6), ('l', 'r')) )
+    path.append( ((4,7), ('l', 'r')) )
+    path.append( ((4,8), ('l', 'r')) )
+    path.append( ((4,9), ('l', 'r')) )
+    path.append( ((4,10), ('t', 'r')) )
+    path.append( ((3,10), ('t', 'b')) )
+    path.append( ((2,10), ('t', 'b', 'l')) )
+
+    # level 1 -- branch right
+    path.append( ((7,3),  ('t', 'b')) )
+    path.append( ((8,3),  ('t', 'b')) )
+    path.append( ((9,3),  ('b', 'r')) )
+    path.append( ((9,4),  ('l', 'r')) )
+    path.append( ((9,5),  ('l', 'r')) )
+    path.append( ((9,6),  ('t'     )) )
+    # level 2 -- branch right
+    path.append( ((10,6), ('t', 'b')) )
+    path.append( ((11,6), ('r'     )) )
+    path.append( ((11,7), ('l', 'r')) )
+    path.append( ((11,8), ('l', 'r')) )
+    path.append( ((11,9), ('l', 'r')) )
+    path.append( ((11,10), ('l', 'r')) )
+    path.append( ((11,11), ('l', 'r')) )
+    path.append( ((11,12), ('t', 'r')) )
+    path.append( ((10,12), ('t', 'b')) )
+    path.append( ((9,12), ('t', 'b')) )
+    path.append( ((8,12), ('t', 'b')) )
+    path.append( ((7,12), ('t', 'b')) )
+    # level 3 -- branch down
+    path.append( ((11,5), ('l', 'r')) )
+    path.append( ((11,4), ('l', 'r')) )
+    path.append( ((11,3), ('l', 'r')) )
+    path.append( ((11,2), ('l', 'r', 'b')) )
+    # level 2 -- branch left
+    path.append( ((8,6), ('t', 'b')) )
+    path.append( ((7,6), ('t', 'b')) )
+    path.append( ((6,6), ('l', 'b')) )
+    path.append( ((6,7), ('l', 'r')) )
+    path.append( ((6,8), ('l', 'r')) )
+    path.append( ((6,9), ('l', 'r')) )
+    path.append( ((6,10), ('l', 'r')) )
+    path.append( ((6,11), ('l', 'r')) )
+    path.append( ((6,12), ('t'     )) )
+    path.append( ((5,12), ('t', 'b')) )
+    path.append( ((4,12), ('t', 'b')) )
+    path.append( ((3,12), ('t', 'b')) )
+    path.append( ((2,12), ('t', 'b')) )
+    path.append( ((1,12), ('t', 'b')) )
+    path.append( ((0,12), ('l', 't')) )
+    path.append( ((0,11), ('l', 'r')) )
+    path.append( ((0,10), ('l', 'r', 'b')) )
+
+
+
+    maze_goal = (0,10) 
+    shortest_path_length = 33
+
+    return path, maze_goal, shortest_path_length
+
+
 ##
 # Begin helper class that defines a simple individual turtle
 ##
