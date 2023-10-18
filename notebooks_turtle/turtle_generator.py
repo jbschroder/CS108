@@ -60,9 +60,6 @@ class create_layout:
 
     '''
 
-    if (maze_number != False) and (pond_location != False):
-      print("Cannot set both pond_location and maze_number.  The maze_number determines the pond_location automatically, as the maze's goal. Ignoring user pond_location and using the maze_number's goal location for the pond.")
-
     self.ax = ax
     self.nx = nx
     self.ny = ny
@@ -748,7 +745,7 @@ class turtle_generator:
 
     # Cannot set maze_number and pond_location at the same time.  
     if (maze_number != False) and (pond_location != False):
-      print("Cannot set both pond_location and maze_number.  The maze_number determines the pond_location automatically, as the maze's goal. Ignoring user pond_location and using the maze_number's goal location for the pond.")
+      print("Cannot set both pond_location and maze_number.  The maze_number determines the pond_location\nautomatically, as the maze's goal. Ignoring user pond_location and using the maze_number's\ngoal location for the pond.")
 
     # Set maze_number: first check that value is either False (for no maze) or a value maze number
     if (maze_number != False) and (maze_number != 1) and (maze_number != 2) and (maze_number != 3):
@@ -761,7 +758,7 @@ class turtle_generator:
       
       # Set the pond_location as the layout's pond_location (i.e., maze goal)
       layout = create_layout(None, self.nx, self.ny, self.maze_number)
-      pond_location = layout.pond_location
+      self.pond_location = layout.pond_location
     else:
       self.maze_number = False
       # Set pond_location if the user specified one 
@@ -1612,8 +1609,8 @@ class turtle_generator:
     Returns
     --------
     True or False (technically called a Boolean)
-      True is returned if no turtles ever collide (occupy the same square at the same time)
-      False is returned if two turtles collide, at some point
+      True is returned if two turtles collide, at some point
+      False is returned if no turtles ever collide (occupy the same square at the same time)
 
     '''
 
@@ -1621,6 +1618,10 @@ class turtle_generator:
     if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
+
+    # If only one turtle, then return False because no collisions are possible
+    if self.number_of_turtles == 1:
+      return False
 
     # Strategy: Replay all the turtle moves, checking to see if two turtles are ever in the same location
 
@@ -1652,9 +1653,9 @@ class turtle_generator:
           if (turtle_i_loc == next_turtle_new_location) and (turtle_i_loc != maze_goal):
             print("Turtle " + str(i) + " and turtle " + str(next_turtle) + " are at the same location, " + \
                   str(turtle_i_loc) + ", which happens after move " + str(t) + "\n  (note we start counting moves at 0)" )
-            return False
+            return True
     
-    return True
+    return False
 
   def save_everything_to_file(self):
     '''
