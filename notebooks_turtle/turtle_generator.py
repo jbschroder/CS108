@@ -870,6 +870,7 @@ class turtle_generator:
                            #   that turtle 0 moved twice, and then turtle 1 moved once
   plotting_offsets = None  # Offsets for plotting multiple turtles in a square
   turtle_scaling = None    # Estimate on how much to scale each turtle as it's plotted on different grid sizes
+  ever_move_off_grid = False # If True, then at some point a turtle tried to move off the grid
 
   def __init__(self, nx=14, ny=14, start_location=(0,0), maze_number=False,
                pond_location=False, number_of_turtles=1):
@@ -1101,6 +1102,7 @@ class turtle_generator:
       if not self.is_location_on_grid(new_location):
         self.turtles[which_turtle].undo_last_move()
         print("You tried to move off the grid to location " + str(new_location) + ".  Ignoring this move.")
+        self.ever_move_off_grid = True
       else:
         self.turtle_tape.append(which_turtle)
     except:
@@ -1136,6 +1138,7 @@ class turtle_generator:
       if not self.is_location_on_grid(new_location):
         self.turtles[which_turtle].undo_last_move()
         print("You tried to move off the grid to location " + str(new_location) + ".  Ignoring this move.")
+        self.ever_move_off_grid = True
       else:
         self.turtle_tape.append(which_turtle)
     except:
@@ -1171,6 +1174,7 @@ class turtle_generator:
       if not self.is_location_on_grid(new_location):
         self.turtles[which_turtle].undo_last_move()
         print("You tried to move off the grid to location " + str(new_location) + ".  Ignoring this move.")
+        self.ever_move_off_grid = True
       else:
         self.turtle_tape.append(which_turtle)
     except:
@@ -1206,6 +1210,7 @@ class turtle_generator:
       if not self.is_location_on_grid(new_location):
         self.turtles[which_turtle].undo_last_move()
         print("You tried to move off the grid to location " + str(new_location) + ".  Ignoring this move.")
+        self.ever_move_off_grid = True
       else:
         self.turtle_tape.append(which_turtle)
     except:
@@ -1385,10 +1390,13 @@ class turtle_generator:
     
     if self.check_continuous_movements(which_turtle):
       if self.check_reached_maze_goal(which_turtle):
-        if self.check_stayed_on_maze_path(which_turtle):
-          return True
+        if not self.ever_move_off_grid:
+          if self.check_stayed_on_maze_path(which_turtle):
+            return True
+          else:
+            print("Turtle did not stay on maze path")
         else:
-          print("Turtle did not stay on maze path")
+            print("Your turtle(s) tried to move off the grid at some point!  See above warnings for more info")
       else:
         print("Turtle did not reach maze goal")
     else:
