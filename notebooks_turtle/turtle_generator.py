@@ -1900,13 +1900,15 @@ class turtle_generator:
     dt_string = now.strftime("%H:%M:%S on %d/%m/%Y")
     print("\nYou just saved your turtle to file at " + dt_string + "\nThank you!\n")
 
-  def watch_me_move(self):
+  def watch_me_move(self, frame_rate=140):
     '''
     Finalize and create animation
 
     Parameters
     --------
-    None
+    frame_rate : number (technically, an integer) that describes how fast
+    the animation moves.  Higher numbers go slower, smaller numbers go faster.
+    The default is 140 and the units are milliseconds.
 
     Returns
     --------
@@ -1997,7 +1999,7 @@ class turtle_generator:
     #ax.axis('equal')
 
     # Note that we plot one extra frame len(self.turtle_tape)+1, so that we can show the starting position
-    anim = matplotlib.animation.FuncAnimation(fig, animate, frames=3*len(self.turtle_tape)+1, interval=140, repeat=False)
+    anim = matplotlib.animation.FuncAnimation(fig, animate, frames=3*len(self.turtle_tape)+1, interval=frame_rate, repeat=False)
 
     return anim
 
