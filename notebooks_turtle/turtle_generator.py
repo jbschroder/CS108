@@ -60,9 +60,6 @@ class create_layout:
 
     '''
 
-    if (maze_number != False) and (pond_location != False):
-      print("Cannot set both pond_location and maze_number.  The maze_number determines the pond_location automatically, as the maze's goal. Ignoring user pond_location and using the maze_number's goal location for the pond.")
-
     self.ax = ax
     self.nx = nx
     self.ny = ny
@@ -74,6 +71,10 @@ class create_layout:
       # Process user's maze_number value (which also sets the pond location)
       if (self.maze_number == 1):
         self.maze_path, self.pond_location, self.shortest_path_length = self.generate_maze1()
+      elif (self.maze_number == 2):
+        self.maze_path, self.pond_location, self.shortest_path_length = self.generate_maze2()
+      elif (self.maze_number == 3):
+        self.maze_path, self.pond_location, self.shortest_path_length = self.generate_maze3()
       else:
         raise ValueError("Invalid Maze Number")
     else:
@@ -411,8 +412,205 @@ class create_layout:
 
     return path, maze_goal, shortest_path_length
 
-  # insert maze 2, 3, 4, and so on...
+  def generate_maze2(self):
+    '''
+    Generate Maze 2 using a stored design.  This maze contains 1 level of branching to include
+    dead-ends and two different paths to the goal 
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    Three values are returned
+      First:  maze_path defining maze 2 (list type, see Notes for details on how the maze is represented)
+      Second: maze_goal location (x,y), that is, where the turtle wants to go
+      Third:  shortest_path_length, that is, the length of the shortest maze path from (0,0) to the maze_goal
+    
+    Notes
+    -----
+    The maze_path is stored as list, with each list element defining one block of the maze
+    For example, if maze_path[k] = ( (3,4), ('l', 'r') ),
+       then this maze part is at point (3,4), with a border to the left and to the right
+       And, if maze_path[k] = ( (6,2), ('t', 'b') ),
+       then this maze part is at point (6,2), with a border on the top and on the bottom
+    Any mixture of 'l', 'r', 't', 'b' is supported for each maze part.
+    '''
+    
+    path = []
+    path.append( ((0,0), ('t', 'b','l')) )
+    path.append( ((1,0), ('t', 'b')) )
+    path.append( ((2,0), ('t', 'b')) )
+    path.append( ((3,0), ('t', 'b')) )
+    path.append( ((4,0), ('t', 'b')) )
+    path.append( ((5,0), ('b', 'r')) )
+    
+    path.append( ((5,1), ('l', 'r')) )
+    path.append( ((5,2), ('l', 'r')) )
+    path.append( ((5,3), ('l', 'r')) )
+    path.append( ((5,4), ('l', 'r')) )
+    path.append( ((5,5), (     'r')) )
+    path.append( ((5,6), ('l', 't')) )
+
+    # define branch 1
+    path.append( ((4,5), ('t', 'b')) )
+    path.append( ((3,5), ('t', 'b')) )
+    path.append( ((2,5), ('b', 'l')) )
+    path.append( ((2,6), ('l', 'r')) )
+    path.append( ((2,7), ('l', 'r')) )
+    path.append( ((2,8), ('l', 'r', 't')) )
+
+    # define branch 2
+    path.append( ((6,6),  ('t', 'b')) )
+    path.append( ((7,6),  ('r'     )) )
+    path.append( ((7,5),  ('l', 'b')) )
+
+    path.append( ((8,5),  ('t', 'b')) )
+    path.append( ((9,5),  ('t', 'b')) )
+    path.append( ((10,5), ('t', 'b')) )
+    path.append( ((11,5), ('t', 'b')) )
+    path.append( ((12,5), ('b', 'r')) )
+
+    path.append( ((12,6),  ('l', 'r')) )
+    path.append( ((12,7),  ('l', 'r')) )
+    path.append( ((12,8),  ('l', 'r')) )
+    path.append( ((12,9),  ('l', 'r')) )
+    path.append( ((12,10), ('l', 'r')) )
+    path.append( ((12,11), ('l', 'r')) )
+    path.append( ((12,12), ('r', 't')) ) 
+
+    # define branch 3
+    path.append( ((7,7),  ('l', 'r')) )
+    path.append( ((7,8),  ('l', 'r')) )
+    path.append( ((7,9),  ('l', 'r')) )
+    path.append( ((7,10), ('l', 'r')) )
+    path.append( ((7,11), ('l', 'r')) )
+    path.append( ((7,12), ('l', 't')) )
+
+    path.append( ((8,12),  ('t', 'b')) )
+    path.append( ((9,12),  ('t', 'b')) )
+    path.append( ((10,12), ('t', 'b')) )
+    path.append( ((11,12), ('t', 'b')) )
+    path.append( ((12,12), ('t')) )
+
+
+    maze_goal = (12,12) 
+    shortest_path_length = 25
+
+    return path, maze_goal, shortest_path_length
   
+  def generate_maze3(self):
+    '''
+    Generate Maze 3 using a stored design.  This maze contains 2 levels of branching to include
+    more dead-ends and multiple paths to the goal 
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    Three values are returned
+      First:  maze_path defining maze 3 (list type, see Notes for details on how the maze is represented)
+      Second: maze_goal location (x,y), that is, where the turtle wants to go
+      Third:  shortest_path_length, that is, the length of the shortest maze path from (0,0) to the maze_goal
+    
+    Notes
+    -----
+    The maze_path is stored as list, with each list element defining one block of the maze
+    For example, if maze_path[k] = ( (3,4), ('l', 'r') ),
+       then this maze part is at point (3,4), with a border to the left and to the right
+       And, if maze_path[k] = ( (6,2), ('t', 'b') ),
+       then this maze part is at point (6,2), with a border on the top and on the bottom
+    Any mixture of 'l', 'r', 't', 'b' is supported for each maze part.
+    '''
+    
+    path = []
+    path.append( ((0,0), ('t', 'b','l')) )
+    path.append( ((1,0), ('t', 'b')) )
+    path.append( ((2,0), ('t', 'b')) )
+    path.append( ((3,0), ('t', 'b')) )
+    path.append( ((4,0), ('t', 'b')) )
+    path.append( ((5,0), ('t', 'b')) )
+    path.append( ((6,0), ('b', 'r')) )
+    
+    path.append( ((6,1), ('l', 'r')) )
+    path.append( ((6,2), ('l', 'r')) )
+    path.append( ((6,3), ('t'     )) )
+
+    # level 1 -- branch to left
+    path.append( ((5,3), ('t', 'b')) )
+    path.append( ((4,3), ('b', 'l')) )
+    path.append( ((4,4), ('l', 'r')) )
+    path.append( ((4,5), (     'r')) )
+    # level 2 -- branch to left
+    path.append( ((3,5), ('t', 'b')) )
+    path.append( ((2,5), ('l', 'b')) )
+    path.append( ((2,6), ('l', 'r')) )
+    path.append( ((2,7), ('l', 'r')) )
+    path.append( ((2,8), ('t', 'r')) )
+    path.append( ((1,8), ('t', 'b')) )
+    path.append( ((0,8), ('t', 'b', 'l')) )
+    # level 2 -- keep going up 
+    path.append( ((4,6), ('l', 'r')) )
+    path.append( ((4,7), ('l', 'r')) )
+    path.append( ((4,8), ('l', 'r')) )
+    path.append( ((4,9), ('l', 'r')) )
+    path.append( ((4,10), ('t', 'r')) )
+    path.append( ((3,10), ('t', 'b')) )
+    path.append( ((2,10), ('t', 'b', 'l')) )
+
+    # level 1 -- branch right
+    path.append( ((7,3),  ('t', 'b')) )
+    path.append( ((8,3),  ('t', 'b')) )
+    path.append( ((9,3),  ('b', 'r')) )
+    path.append( ((9,4),  ('l', 'r')) )
+    path.append( ((9,5),  ('l', 'r')) )
+    path.append( ((9,6),  ('t'     )) )
+    # level 2 -- branch right
+    path.append( ((10,6), ('t', 'b')) )
+    path.append( ((11,6), ('r'     )) )
+    path.append( ((11,7), ('l', 'r')) )
+    path.append( ((11,8), ('l', 'r')) )
+    path.append( ((11,9), ('l', 'r')) )
+    path.append( ((11,10), ('l', 'r')) )
+    path.append( ((11,11), ('l', 'r')) )
+    path.append( ((11,12), ('t', 'r')) )
+    path.append( ((10,12), ('t', 'b')) )
+    path.append( ((9,12), ('t', 'b')) )
+    path.append( ((8,12), ('t', 'b')) )
+    path.append( ((7,12), ('t', 'b')) )
+    # level 3 -- branch down
+    path.append( ((11,5), ('l', 'r')) )
+    path.append( ((11,4), ('l', 'r')) )
+    path.append( ((11,3), ('l', 'r')) )
+    path.append( ((11,2), ('l', 'r', 'b')) )
+    # level 2 -- branch left
+    path.append( ((8,6), ('t', 'b')) )
+    path.append( ((7,6), ('t', 'b')) )
+    path.append( ((6,6), ('l', 'b')) )
+    path.append( ((6,7), ('l', 'r')) )
+    path.append( ((6,8), ('l', 'r')) )
+    path.append( ((6,9), ('l', 'r')) )
+    path.append( ((6,10), ('l', 'r')) )
+    path.append( ((6,11), ('l', 'r')) )
+    path.append( ((6,12), ('t'     )) )
+    path.append( ((5,12), ('t', 'b')) )
+    path.append( ((4,12), ('t', 'b')) )
+    path.append( ((3,12), ('t', 'b')) )
+    path.append( ((2,12), ('t', 'b')) )
+    path.append( ((1,12), ('t', 'b')) )
+    path.append( ((0,12), ('l', 't')) )
+    path.append( ((0,11), ('l', 'r')) )
+    path.append( ((0,10), ('l', 'r', 'b')) )
+
+
+
+    maze_goal = (0,10) 
+    shortest_path_length = 33
+
+    return path, maze_goal, shortest_path_length
+
+
 ##
 # Begin helper class that defines a simple individual turtle
 ##
@@ -672,6 +870,7 @@ class turtle_generator:
                            #   that turtle 0 moved twice, and then turtle 1 moved once
   plotting_offsets = None  # Offsets for plotting multiple turtles in a square
   turtle_scaling = None    # Estimate on how much to scale each turtle as it's plotted on different grid sizes
+  ever_move_off_grid = False # If True, then at some point a turtle tried to move off the grid
 
   def __init__(self, nx=14, ny=14, start_location=(0,0), maze_number=False,
                pond_location=False, number_of_turtles=1):
@@ -746,8 +945,9 @@ class turtle_generator:
       self.start_location = (0,0)
       print("Invalid start location given. start should be coordinates inside the grid like (0,0) or (2,2). Using default value (0,0) instead.")
 
+    # Cannot set maze_number and pond_location at the same time.  
     if (maze_number != False) and (pond_location != False):
-      print("Cannot set both pond_location and maze_number.  The maze_number determines the pond_location automatically, as the maze's goal. Ignoring user pond_location and using the maze_number's goal location for the pond.")
+      print("Cannot set both pond_location and maze_number.  The maze_number determines the pond_location\nautomatically, as the maze's goal. Ignoring user pond_location and using the maze_number's\ngoal location for the pond.")
 
     # Set maze_number: first check that value is either False (for no maze) or a value maze number
     if (maze_number != False) and (maze_number != 1) and (maze_number != 2) and (maze_number != 3):
@@ -760,7 +960,7 @@ class turtle_generator:
       
       # Set the pond_location as the layout's pond_location (i.e., maze goal)
       layout = create_layout(None, self.nx, self.ny, self.maze_number)
-      pond_location = layout.pond_location
+      self.pond_location = layout.pond_location
     else:
       self.maze_number = False
       # Set pond_location if the user specified one 
@@ -902,6 +1102,7 @@ class turtle_generator:
       if not self.is_location_on_grid(new_location):
         self.turtles[which_turtle].undo_last_move()
         print("You tried to move off the grid to location " + str(new_location) + ".  Ignoring this move.")
+        self.ever_move_off_grid = True
       else:
         self.turtle_tape.append(which_turtle)
     except:
@@ -937,6 +1138,7 @@ class turtle_generator:
       if not self.is_location_on_grid(new_location):
         self.turtles[which_turtle].undo_last_move()
         print("You tried to move off the grid to location " + str(new_location) + ".  Ignoring this move.")
+        self.ever_move_off_grid = True
       else:
         self.turtle_tape.append(which_turtle)
     except:
@@ -972,6 +1174,7 @@ class turtle_generator:
       if not self.is_location_on_grid(new_location):
         self.turtles[which_turtle].undo_last_move()
         print("You tried to move off the grid to location " + str(new_location) + ".  Ignoring this move.")
+        self.ever_move_off_grid = True
       else:
         self.turtle_tape.append(which_turtle)
     except:
@@ -1007,6 +1210,7 @@ class turtle_generator:
       if not self.is_location_on_grid(new_location):
         self.turtles[which_turtle].undo_last_move()
         print("You tried to move off the grid to location " + str(new_location) + ".  Ignoring this move.")
+        self.ever_move_off_grid = True
       else:
         self.turtle_tape.append(which_turtle)
     except:
@@ -1186,10 +1390,13 @@ class turtle_generator:
     
     if self.check_continuous_movements(which_turtle):
       if self.check_reached_maze_goal(which_turtle):
-        if self.check_stayed_on_maze_path(which_turtle):
-          return True
+        if not self.ever_move_off_grid:
+          if self.check_stayed_on_maze_path(which_turtle):
+            return True
+          else:
+            print("Turtle did not stay on maze path")
         else:
-          print("Turtle did not stay on maze path")
+            print("Your turtle(s) tried to move off the grid at some point!  See above warnings for more info")
       else:
         print("Turtle did not reach maze goal")
     else:
@@ -1611,8 +1818,8 @@ class turtle_generator:
     Returns
     --------
     True or False (technically called a Boolean)
-      True is returned if no turtles ever collide (occupy the same square at the same time)
-      False is returned if two turtles collide, at some point
+      True is returned if two turtles collide, at some point
+      False is returned if no turtles ever collide (occupy the same square at the same time)
 
     '''
 
@@ -1620,6 +1827,10 @@ class turtle_generator:
     if (self.turtles == []) or (self.turtles == None):
       print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
       return
+
+    # If only one turtle, then return False because no collisions are possible
+    if self.number_of_turtles == 1:
+      return False
 
     # Strategy: Replay all the turtle moves, checking to see if two turtles are ever in the same location
 
@@ -1631,7 +1842,7 @@ class turtle_generator:
 
     # note, we don't plot the maze, so we pass in None for the ax
     layout = create_layout(None, self.nx, self.ny, self.maze_number, self.pond_location)
-    # grab goal location (collisions there are OK)
+    # grab maze goal location because collisions there are OK (note pond location is the maze_goal)
     maze_goal = layout.pond_location
 
     # loop over all moves
@@ -1651,9 +1862,9 @@ class turtle_generator:
           if (turtle_i_loc == next_turtle_new_location) and (turtle_i_loc != maze_goal):
             print("Turtle " + str(i) + " and turtle " + str(next_turtle) + " are at the same location, " + \
                   str(turtle_i_loc) + ", which happens after move " + str(t) + "\n  (note we start counting moves at 0)" )
-            return False
+            return True
     
-    return True
+    return False
 
   def save_everything_to_file(self):
     '''
@@ -1697,13 +1908,15 @@ class turtle_generator:
     dt_string = now.strftime("%H:%M:%S on %d/%m/%Y")
     print("\nYou just saved your turtle to file at " + dt_string + "\nThank you!\n")
 
-  def watch_me_move(self):
+  def watch_me_move(self, frame_rate=140):
     '''
     Finalize and create animation
 
     Parameters
     --------
-    None
+    frame_rate : number (technically, an integer) that describes how fast
+    the animation moves.  Higher numbers go slower, smaller numbers go faster.
+    The default is 140 and the units are milliseconds.
 
     Returns
     --------
@@ -1794,7 +2007,7 @@ class turtle_generator:
     #ax.axis('equal')
 
     # Note that we plot one extra frame len(self.turtle_tape)+1, so that we can show the starting position
-    anim = matplotlib.animation.FuncAnimation(fig, animate, frames=3*len(self.turtle_tape)+1, interval=140, repeat=False)
+    anim = matplotlib.animation.FuncAnimation(fig, animate, frames=3*len(self.turtle_tape)+1, interval=frame_rate, repeat=False)
 
     return anim
 
