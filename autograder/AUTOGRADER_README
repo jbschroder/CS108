@@ -1,0 +1,20 @@
+### Autograder steps... for all steps, replace # with the number of the homework
+1. Login to Canvas
+2. Go to CS108L Course
+
+### Download Student Submissions
+3. Click on Assignments -> Weekly Assignments -> Homework #
+4. Click 'Download Submissions' at bottom of screen
+5. Move downloaded submissions into hw# folder
+
+### Download gradebook CSV file
+6. Click on 'Grades'
+7. Search Assignment Name (e.g. 'Homework 0') in 'Search Assignments' box
+8. Click Export -> Export Current Gradebook View
+9. Move downloaded csv file to hw# folder, change name to hw#_grades.csv
+
+### Run autograder
+10. Go into hw# folder
+11. Run `python3 hw#_grader.py`
+    - This updates the hw#_grades.csv to include updated grades for the assignment based on which autograder tests pass.  This can be imported to canvas (Grades->import) to update student grades.
+    - This will also create a file hw#_feedback.csv which contains feedback for each student stating which tests failed.  This feedback would need to be manually added to student canvas submissions.
