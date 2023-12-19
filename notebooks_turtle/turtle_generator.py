@@ -1821,6 +1821,11 @@ class turtle_generator:
       [ (0,0), (1,0), (2,0), (2,1) ]
     '''
 
+    # Check that some turtles have been initialized
+    if (self.turtles == []) or (self.turtles == None):
+      print("You don't have any turtles yet!\n Try doing calling turtle.start_new_journey(), followed by some movements like\n turtle.move_up()")
+      return
+
     movements, trail = self.turtles[which_turtle].get_movements_and_trail()
     return movements
 
