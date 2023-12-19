@@ -1805,7 +1805,7 @@ class turtle_generator:
     return False
 
   
-  def get_turtle_movements(self, , which_turtle=0):
+  def get_movements(self, , which_turtle=0):
     '''
     Return the list of movements for this turtle 
 
