@@ -1805,6 +1805,25 @@ class turtle_generator:
     return False
 
   
+  def get_turtle_movements(self, , which_turtle=0):
+    '''
+    Return the list of movements for this turtle 
+
+    Parameters
+    ----------
+    which_turtle : number (such as 1, 2, or 3), which specifies the turtle about which we get the lists of movements 
+
+    Returns
+    -------
+    List of movements
+      Return the list of movements for this turtle, for example if a turtle started at (0,0), and then
+      moved twice to the right, and once up, the list returned would be
+      [ (0,0), (1,0), (2,0), (2,1) ]
+    '''
+
+    movements, trail = self.turtles[which_turtle].get_movements_and_trail()
+    return movements
+
   def do_turtles_collide(self):
     '''
     Check if any of the turtles collide, that is, occupy the same square at the
