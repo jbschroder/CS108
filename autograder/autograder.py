@@ -6,12 +6,11 @@ import pandas as pd
 def grade_homework(TestClass, csv_filename, test_names, test_points, test_feedbacks):
     ## Copy Roster to Initial Homework0 Grade CSV File
 
-    # When reading from CSV, two things to pay attention to.
-    #  - The first column has no header, so we have to tell pandas that this is the index column
-    #  - Force student ID to be a string for printing to file.  The ID is really an integer,
-    #    but the ID integers are too big to fit into a regular int with max value of 32K.
-    #    By default, pandas will treat the ID as a string
-    df = pd.read_csv(csv_filename, index_col=[0], dtype={"ID": str})
+    # When reading from CSV, we need to force student ID to be a string for
+    # printing to file.  The ID is really an integer, but the ID integers are
+    # too big to fit into a regular int with max value of 32K.  By default,
+    # pandas will treat the ID as a string
+    df = pd.read_csv(csv_filename, dtype={"ID": str})
 
 
     hw_scores = list()
@@ -79,8 +78,8 @@ def grade_homework(TestClass, csv_filename, test_names, test_points, test_feedba
     for i in range(len(hw_scores)):
         df.at[i+1, col_name] = hw_scores[i]
 
-    # save updated grades to csv file
-    df.to_csv(csv_filename)
+    # save updated grades to csv file, note Canvas does not want the index column
+    df.to_csv(csv_filename, index=False)
 
     # write separate feedback file
     df = pd.DataFrame(data={'Name' : names[1:], 'Score' : hw_scores, 'Feedback' : hw_feedback})
