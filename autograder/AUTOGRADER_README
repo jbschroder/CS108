@@ -11,10 +11,21 @@
 6. Click on 'Grades'
 7. Search Assignment Name (e.g. 'Homework 0') in 'Search Assignments' box
 8. Click Export -> Export Current Gradebook View
+   (this will export only the visible columns)
 9. Move downloaded csv file to hw# folder, change name to hw#_grades.csv
 
 ### Run autograder
 10. Go into hw# folder
-11. Run `python3 hw#_grader.py`
-    - This updates the hw#_grades.csv to include updated grades for the assignment based on which autograder tests pass.  This can be imported to canvas (Grades->import) to update student grades.
-    - This will also create a file hw#_feedback.csv which contains feedback for each student stating which tests failed.  This feedback would need to be manually added to student canvas submissions.
+11. Create a hw#_grader.py file, based on a previous example.
+    - Note: need to create new  test_**  functions,
+       -- Each test function should do an `assert` at the end
+       -- Test functions can do things before the assert, like load a turtle from file and run checks
+    - Note: the lines in __main__ need to be adapted for each homework
+    - Note: should update the `TestHomework#` function name
+
+12. Run `python3 hw#_grader.py`
+    - This updates the hw#_grades.csv to include updated grades for the assignment based on which
+      autograder tests pass.  This can be imported to canvas (Grades->import) to update student grades.
+    - This will also create a file hw#_feedback.csv which contains feedback for each student stating
+      which tests failed.  This feedback would need to be manually added to student canvas submissions.
+
