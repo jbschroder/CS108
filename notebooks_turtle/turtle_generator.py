@@ -1497,9 +1497,9 @@ class turtle_generator:
         y_loc = move[1]
         ax.fill_between([x_loc-0.5, x_loc+0.5], [y_loc-0.5, y_loc-0.5], [y_loc+0.5, y_loc+0.5], color=color)
 
-  def is_pond_above(self, which_turtle=0):
+  def is_pond_up(self, which_turtle=0):
     '''
-    Return True or False, whether the pond is above the current turtle location
+    Return True or False, whether the pond is up (above) the current turtle location
 
     Parameters
     ----------
@@ -1530,9 +1530,9 @@ class turtle_generator:
     else:
       return False
   
-  def is_pond_below(self, which_turtle=0):
+  def is_pond_down(self, which_turtle=0):
     '''
-    Return True or False, whether the pond is below the current turtle location
+    Return True or False, whether the pond is down (below) the current turtle location
 
     Parameters
     ----------
@@ -1629,9 +1629,9 @@ class turtle_generator:
     else:
       return False
 
-  def is_path_below(self, which_turtle=0):
+  def is_path_down(self, which_turtle=0):
     '''
-    Return True or False, whether the maze path leads below from the current turtle location.
+    Return True or False, whether the maze path leads down (below) from the current turtle location.
     Note that the maze path can be open in multiple directions
 
     Parameters
@@ -1673,9 +1673,9 @@ class turtle_generator:
     return False
 
 
-  def is_path_above(self, which_turtle=0):
+  def is_path_up(self, which_turtle=0):
     '''
-    Return True or False, whether the maze path leads above from the current turtle location.
+    Return True or False, whether the maze path leads up (above) from the current turtle location.
     Note that the maze path can be open in multiple directions
 
     Parameters
