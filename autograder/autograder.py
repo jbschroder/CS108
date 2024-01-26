@@ -3,8 +3,31 @@ import unittest, sys, os, importlib
 from io import StringIO
 import pandas as pd
 
-def grade_homework(TestClass, csv_filename, test_names, test_points, test_feedbacks):
-    ## Copy Roster to Initial Homework0 Grade CSV File
+def grade_homework(TestClass, hw_number, test_names, test_points, test_feedbacks):
+    '''
+    TestClass: 
+        Class like hw0/hw0_grader.py, which defines the tests for the homework
+
+    hw_number:
+        integer, like 0, 1, 2, 3... indicating which homework this is
+
+    test_names, test_points, test_feedbacks
+        Lists that define the tests that you want to run form TestClass 
+        
+        test_names[k] : names of kth test to run (run test with name TestClass.test_names[k])
+        test_points[k] : how many points kth test is worth
+        test_feedbacks[k] : string of feedback to give if test fails
+
+
+    Output: Writes grades and feedback to hw#_grades.csv and hw#_feedback.csv
+
+    '''
+
+    csv_filename = 'hw'+str(hw_number)+'_grades.csv'
+
+    if len(test_names) != len(test_points) != len(test_feedbacks):
+        raise ValueError("test_* lists need to be the same length!")
+
 
     # When reading from CSV, we need to force student ID to be a string for
     # printing to file.  The ID is really an integer, but the ID integers are
@@ -37,8 +60,8 @@ def grade_homework(TestClass, csv_filename, test_names, test_points, test_feedba
                 sys.stderr = StringIO()
 
                 filename = file[0:-3]
-                tests = [TestClass('test_load', filename), TestClass('test_output', filename)]
-                test_points = [50, 50]
+                #tests = [TestClass('test_load', filename), TestClass('test_output', filename)]
+                tests = [ TestClass(name, filename) for name in test_names ]
                 suite = unittest.TestSuite()
                 suite.addTests(tests)
                 results = unittest.TextTestRunner().run(suite)
@@ -53,6 +76,7 @@ def grade_homework(TestClass, csv_filename, test_names, test_points, test_feedba
                 score = 100
                 feedback = ""
                 if not results.wasSuccessful():
+                    #import pdb; pdb.set_trace()
                     feedback += "Tests that failed:"
                     for error in results.failures:
                         score -= test_points[tests.index(error[0])]
@@ -70,7 +94,8 @@ def grade_homework(TestClass, csv_filename, test_names, test_points, test_feedba
 
     col_name = ""
     for header in list(df):
-        if "Homework 0" in header:
+        column_name = "Homework " + str(hw_number)
+        if column_name in header:
             col_name = header
             break
 

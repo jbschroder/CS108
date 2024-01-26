@@ -29,3 +29,8 @@
     - This will also create a file hw#_feedback.csv which contains feedback for each student stating
       which tests failed.  This feedback would need to be manually added to student canvas submissions.
 
+Notes:
+Two odd cases will generate "Tests that failed" in feedback.csv
+- Files that end in .py.py will do this 
+- Files that carry out the required tasks and pass the tests, but generate an error at the end will do this
+
