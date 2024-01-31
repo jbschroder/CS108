@@ -76,11 +76,17 @@ def grade_homework(TestClass, hw_number, test_names, test_points, test_feedbacks
                 score = 100
                 feedback = ""
                 if not results.wasSuccessful():
-                    #import pdb; pdb.set_trace()
+                    
                     feedback += "Tests that failed:"
+                    # Does this double count some failures and errors?  Not sure.  But there
+                    # are instances where an error is thrown but no failure, and vice versa
                     for error in results.failures:
                         score -= test_points[tests.index(error[0])]
                         feedback += test_feedbacks[tests.index(error[0])] + ";" 
+                    for error in results.errors:
+                        score -= test_points[tests.index(error[0])]
+                        feedback += test_feedbacks[tests.index(error[0])] + ";" 
+
                 else:
                     feedback += "Passed All Tests"
                 hw_scores.append(score)
