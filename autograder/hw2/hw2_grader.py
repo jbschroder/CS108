@@ -51,7 +51,11 @@ class TestHomework2(unittest.TestCase):
             self.assertTrue("turtle.move_right()" in file_contents, msg = "Where are your move_right lines?") 
             self.assertTrue("turtle.move_up()" in file_contents, msg = "Where are your move_up lines?") 
             self.assertTrue("turtle.check_maze_completed()" in file_contents, msg = "Where is your check_maze_completed line?") 
+            if not ("turtle.save_everything_to_file()" in file_contents):
+                print ("   " + self.filename + " forgot a save turtle to file line, code may still have correct parts, cannot check")
             self.assertTrue("turtle.save_everything_to_file()" in file_contents, msg = "Where is your save_everything_to_file line?") 
+        #
+        matplotlib.pyplot.close('all')
         
 
 
@@ -63,6 +67,8 @@ class TestHomework2(unittest.TestCase):
         turtle = pickle.load(filehandler)
         
         self.assertTrue(turtle.check_maze_completed() == True, msg = "Your turtle did not successfully complete maze, turtle.check_maze_completed() returned False")
+        #
+        matplotlib.pyplot.close('all')
 
 
     def test_cleanup(self):
@@ -73,6 +79,8 @@ class TestHomework2(unittest.TestCase):
             print("removed file..")
         except:
             pass
+        #
+        matplotlib.pyplot.close('all')
 
 if __name__=='__main__':
     # UPDATE: If you add a new test function, you have to add it in the below test_ lists 

@@ -3,7 +3,6 @@ import unittest, sys, os, importlib
 from io import StringIO
 sys.path.append("..")
 import autograder
-import matplotlib
 
 # UPDATE:  Homework# here and below (4 total times)
 class TestHomework4(unittest.TestCase):
@@ -28,21 +27,21 @@ class TestHomework4(unittest.TestCase):
             
     def test_load(self):
         self.assertTrue(True, msg = "Testing that code loads")
-        matplotlib.pyplot.close('all')
 
     def test_turtle_loading(self):
         # UPDATE: can import turtle_generator (download file and import)
         #         can load a turtle from file here, and then run checks
         #         need to end this function with an assert...
+        #import pdb; pdb.set_trace()
         
         import pickle
         filehandler = open('turtle.pickle', 'rb')
         turtle = pickle.load(filehandler)
-        #import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
         
         self.assertTrue( turtle.nx == 14, msg = "Turtle grid size in x changed from 14")
         self.assertTrue( turtle.ny == 14, msg = "Turtle grid size in y changed from 14")
-        self.assertTrue( turtle.start_location == (0,0), msg = "Turtle start location changed from (0,0) ") 
+        #self.assertTrue( turtle.start_location == (0,0), msg = "Turtle start location changed from (0,0) ")  # This has separate test below
         self.assertTrue( turtle.pond_location == (12,12), msg = "Turtle pond location changed from (12,12) ")
         self.assertTrue( turtle.maze_number == 2, msg = "Turtle maze number should be 2")
         self.assertTrue( turtle.number_of_turtles == 1, msg = "There should be 1 turtle")
@@ -54,71 +53,78 @@ class TestHomework4(unittest.TestCase):
             self.assertTrue("turtle.start_new_journey()" in file_contents, msg = "Where is the start_new_journey line?") 
             self.assertTrue("turtle.move_right(" in file_contents, msg = "Where are your move_right lines?") 
             self.assertTrue("turtle.move_up(" in file_contents, msg = "Where are your move_up lines?") 
-            #self.assertTrue("turtle.check_maze_completed(" in file_contents, msg = "Where is your check_maze_completed line?")
+            self.assertTrue("turtle.check_maze_completed(" in file_contents, msg = "Where is your check_maze_completed line?") 
             if not ("turtle.save_everything_to_file()" in file_contents):
                 print ("   " + self.filename + " forgot a save turtle to file line, code may still have correct parts, cannot check")
             self.assertTrue("turtle.save_everything_to_file()" in file_contents, msg = "Where is your save_everything_to_file line?") 
         #
         matplotlib.pyplot.close('all')
+        
+
+
+    def test_turtle_start_loc(self):
+        
+        import pickle
+        filehandler = open('turtle.pickle', 'rb')
+        turtle = pickle.load(filehandler)
+        import pdb; pdb.set_trace()
+
+        # They can either start the turtle at (2,8), or move the turtle there
+        correct_start_loc = False
+        if turtle.start_location == (2,8):
+            correct_start_loc = True
+        else:
+            moves, trail = turtle.turtles[0].get_movements_and_trail()
+            if (2,8) in moves:
+                correct_start_loc = True
+
+        self.assertTrue(correct_start_loc , msg = "Turtle start location changed from (2,8) ")
+        #
+        matplotlib.pyplot.close('all')
+
 
     def test_turtle_complete_maze(self):
+        #import pdb; pdb.set_trace()
         
         import pickle
         filehandler = open('turtle.pickle', 'rb')
         turtle = pickle.load(filehandler)
-        #import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
         
         self.assertTrue(turtle.check_maze_completed() == True, msg = "Your turtle 0 did not successfully complete maze, turtle.check_maze_completed() returned False")
-        self.assertTrue(turtle.check_continuous_movements() == True , msg = "Turtle did not have continuous movements")
         #
         matplotlib.pyplot.close('all')
+    
 
-
-    def test_alternating_trail(self):
+    def test_continuous_movements(self):
         import pickle
         filehandler = open('turtle.pickle', 'rb')
         turtle = pickle.load(filehandler)
-        #import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
         
-        moves, trail = turtle.turtles[0].get_movements_and_trail()
-
-        correct_trail1 = [False, False, False, True, False, False, True, False, False, True, False, False, True, False, False, True, False, False, True, False, False, True, False, False, True]
-        correct_trail2 = [False, False, False, True, False, False, True, False, False, True, False, False, True, False, False, True, False, False, True, False, False, True, False, False, False]
-        correct_trail3 = [False, True, False, False, True, False, False, True, False, False, True, False, False, True, False, False, True, False, False, True, False, False, True, False, False]
-        
-        # Allow them to alternate in both ways
-        correct_trails = False
-        if (trail == correct_trail1) or (trail == correct_trail2) or (trail == correct_trail3):
-            correct_trails = True
-
-        self.assertTrue(correct_trails == True, msg = "Turtles left an incorrect trail")
+        self.assertTrue(turtle.check_continuous_movements() == True , msg = "Turtle start location changed from (2,8) ")
         #
         matplotlib.pyplot.close('all')
 
 
-    def test_while_structure(self):
+    def test_move_turtle_structure(self):
         import pickle
         import re
         filehandler = open('turtle.pickle', 'rb')
         turtle = pickle.load(filehandler)
-        #import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
 
         with open(self.filename+".py") as myfile:
             # Make file all lower case, and strip all spaces
             file_contents = myfile.read().lower().replace(' ', '')
             
-            # RegEx search for while loop
-            m = re.search(r'while.*:', file_contents)
-            while_loop_correct = False
+            # RegEx search for move_turtle command
+            m = re.search(r'turtle=move_turtle\(.*start_loc=\(2,8\)\)', file_contents)
+            move_turtle_correct = False
             if m is not None:
-                while_loop_correct = True
+                move_turtle_correct = True
             ##
-            print("while loop:  " + self.filename)
-            if m is not None:
-                print("  " + file_contents[m.span()[0]:m.span()[1]])
-            else:
-                print("  no while loop...")
-            self.assertTrue(while_loop_correct == True, msg = "no while loop used to move turtle") 
+            self.assertTrue(move_turtle_correct == True, msg = "move_turtle function doesn't use start_loc") 
         #
         matplotlib.pyplot.close('all')
         
@@ -131,8 +137,6 @@ class TestHomework4(unittest.TestCase):
             print("removed file..")
         except:
             pass
-        print("")
-        print("")
         #
         matplotlib.pyplot.close('all')
 
@@ -140,8 +144,8 @@ if __name__=='__main__':
 
 
     # UPDATE: If you add a new test function, you have to add it in the below test_ lists 
-    test_points =    [15,                            15,                                25,                      25,                              20,                            0]
-    test_names =     ['test_load',            'test_turtle_loading',           'test_turtle_complete_maze', 'test_alternating_trail',        'test_while_structure',   'test_cleanup']
-    test_feedbacks = ['Cannot load .py file', 'Turtle does not load properly', 'Maze not completed',        'alternating trail not correct', 'while loop not correct', 'No turtle file created']
+    test_points =    [15,                            15,                            20,                                   20,                      20,                              20,                            0]
+    test_names =     ['test_load',            'test_turtle_loading',           'test_turtle_start_loc',          'test_turtle_complete_maze', 'test_continuous_movements',   'test_move_turtle_structure', 'test_cleanup']
+    test_feedbacks = ['Cannot load .py file', 'Turtle does not load properly', 'Turtle does not start at (2,8)', 'Maze not completed',        'turtle moves not continuous', 'move_turtle not correct',    'No turtle file created']
     # UPDATE: You need to update homework number in two places below
     autograder.grade_homework(TestHomework4, 4, test_names, test_points, test_feedbacks)

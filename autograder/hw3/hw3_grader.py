@@ -27,6 +27,8 @@ class TestHomework3(unittest.TestCase):
             
     def test_load(self):
         self.assertTrue(True, msg = "Testing that code loads")
+        #
+        matplotlib.pyplot.close('all')
 
     def test_turtle_loading(self):
         # UPDATE: can import turtle_generator (download file and import)
@@ -52,7 +54,11 @@ class TestHomework3(unittest.TestCase):
             self.assertTrue("turtle.move_right(which_turtle=" in file_contents, msg = "Where are your move_right lines?") 
             self.assertTrue("turtle.move_up(which_turtle=" in file_contents, msg = "Where are your move_up lines?") 
             self.assertTrue("turtle.check_maze_completed(which_turtle=" in file_contents, msg = "Where is your check_maze_completed line?") 
+            if not ("turtle.save_everything_to_file()" in file_contents):
+                print ("   " + self.filename + " forgot a save turtle to file line, code may still have correct parts, cannot check")
             self.assertTrue("turtle.save_everything_to_file()" in file_contents, msg = "Where is your save_everything_to_file line?") 
+        #
+        matplotlib.pyplot.close('all')
         
 
 
@@ -63,8 +69,10 @@ class TestHomework3(unittest.TestCase):
         filehandler = open('turtle.pickle', 'rb')
         turtle = pickle.load(filehandler)
         
-        self.assertTrue(turtle.check_maze_completed() == True, msg = "Your turtle 0 did not successfully complete maze, turtle.check_maze_completed(which_turtle=0) returned False")
-        self.assertTrue(turtle.check_maze_completed() == True, msg = "Your turtle 1 did not successfully complete maze, turtle.check_maze_completed(which_turtle=1) returned False")
+        self.assertTrue(turtle.check_maze_completed(which_turtle=0) == True, msg = "Your turtle 0 did not successfully complete maze, turtle.check_maze_completed(which_turtle=0) returned False")
+        self.assertTrue(turtle.check_maze_completed(which_turtle=1) == True, msg = "Your turtle 1 did not successfully complete maze, turtle.check_maze_completed(which_turtle=1) returned False")
+        #
+        matplotlib.pyplot.close('all')
     
     def test_alternating_trail(self):
         import pickle
@@ -87,6 +95,8 @@ class TestHomework3(unittest.TestCase):
             correct_trails = True
 
         self.assertTrue(correct_trails == True, msg = "Turtles left an incorrect trail")
+        #
+        matplotlib.pyplot.close('all')
         
 
     def test_cleanup(self):
@@ -97,6 +107,8 @@ class TestHomework3(unittest.TestCase):
             print("removed file..")
         except:
             pass
+        #
+        matplotlib.pyplot.close('all')
 
 if __name__=='__main__':
     # UPDATE: If you add a new test function, you have to add it in the below test_ lists 
