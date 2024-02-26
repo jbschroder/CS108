@@ -3,6 +3,7 @@ import unittest, sys, os, importlib
 from io import StringIO
 sys.path.append("..")
 import autograder
+import matplotlib
 
 # UPDATE:  Homework# here and below (4 total times)
 class TestHomework1(unittest.TestCase):
