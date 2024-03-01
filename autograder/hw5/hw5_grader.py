@@ -106,29 +106,31 @@ class TestHomework5(unittest.TestCase):
         #
         matplotlib.pyplot.close('all')
 
+   # The students implemented setting the starting location to (2,8) in too many different ways, for me
+   # to test for a simple REGEX line match like below.  So, I'm commenting this out, and just requiring above, that
+   # their turtle visit (2,8)
+   #def test_move_turtle_structure(self):
+   #    import pickle
+   #    import re
+   #    filehandler = open('turtle.pickle', 'rb')
+   #    turtle = pickle.load(filehandler)
+   #    #import pdb; pdb.set_trace()
 
-    def test_move_turtle_structure(self):
-        import pickle
-        import re
-        filehandler = open('turtle.pickle', 'rb')
-        turtle = pickle.load(filehandler)
-        #import pdb; pdb.set_trace()
+   #    # they are supposed to call a function named move_turtle with a start_loc parameter.  Make sure that line appears
 
-        # they are supposed to call a function named move_turtle with a start_loc parameter.  Make sure that line appears
-
-        with open(self.filename+".py") as myfile:
-            # Make file all lower case, and strip all spaces
-            file_contents = myfile.read().lower().replace(' ', '')
-            
-            # RegEx search for move_turtle command
-            m = re.search(r'=move_turtle\(.*start_loc=\(2,8\)\)', file_contents)
-            move_turtle_correct = False
-            if m is not None:
-                move_turtle_correct = True
-            ##
-            self.assertTrue(move_turtle_correct == True, msg = "move_turtle function doesn't use start_loc") 
-        #
-        matplotlib.pyplot.close('all')
+   #    with open(self.filename+".py") as myfile:
+   #        # Make file all lower case, and strip all spaces
+   #        file_contents = myfile.read().lower().replace(' ', '')
+   #        
+   #        # RegEx search for move_turtle command
+   #        m = re.search(r'move_turtle\(.*start_loc=\(2,8\).*\)', file_contents)
+   #        move_turtle_correct = False
+   #        if m is not None:
+   #            move_turtle_correct = True
+   #        ##
+   #        self.assertTrue(move_turtle_correct == True, msg = "move_turtle function doesn't use start_loc") 
+   #    #
+   #    matplotlib.pyplot.close('all')
         
 
     def test_cleanup(self):
@@ -146,8 +148,8 @@ if __name__=='__main__':
 
 
     # UPDATE: If you add a new test function, you have to add it in the below test_ lists 
-    test_points =    [15,                            15,                            20,                                   20,                      20,                              20,                            0]
-    test_names =     ['test_load',            'test_turtle_loading',           'test_turtle_start_loc',          'test_turtle_complete_maze', 'test_continuous_movements',   'test_move_turtle_structure', 'test_cleanup']
-    test_feedbacks = ['Cannot load .py file', 'Turtle does not load properly', 'Turtle does not start at (2,8)', 'Maze not completed',        'turtle moves not continuous', 'move_turtle not correct',    'No turtle file created']
+    test_points =    [15,                            15,                            25,                                   25,                      20,                            0]
+    test_names =     ['test_load',            'test_turtle_loading',           'test_turtle_start_loc',          'test_turtle_complete_maze', 'test_continuous_movements',  'test_cleanup']
+    test_feedbacks = ['Cannot load .py file', 'Turtle does not load properly', 'Turtle does not start at (2,8)', 'Maze not completed',        'turtle moves not continuous', 'No turtle file created']
     # UPDATE: You need to update homework number in two places below
     autograder.grade_homework(TestHomework5, 5, test_names, test_points, test_feedbacks)
