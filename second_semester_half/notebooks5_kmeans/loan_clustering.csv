@@ -108,7 +108,7 @@ LP001634,Male,No,0,Graduate,No,1916,5063,67,360,0,Rural,N
 LP001636,Male,Yes,0,Graduate,No,4600,0,73,180,1,Semiurban,Y
 LP001639,Female,Yes,0,Graduate,No,3625,0,108,360,1,Semiurban,Y
 LP001641,Male,Yes,1,Graduate,Yes,2178,0,66,300,0,Rural,N
-LP001643,Male,Yes,0,Graduate,No,2383,2138,58,360,,Rural,Y
+LP001643,Male,Yes,0,Graduate,No,2383,2138,58,360,0,Rural,Y
 LP001653,Male,No,0,Not Graduate,No,4885,0,48,360,1,Rural,Y
 LP001658,Male,No,0,Graduate,No,3858,0,76,360,1,Semiurban,Y
 LP001664,Male,No,0,Graduate,No,4191,0,120,360,1,Rural,Y
